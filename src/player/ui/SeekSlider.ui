@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>998</width>
+    <height>633</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QSlider" name="seekSlider">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>300</y>
+     <width>741</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+
+/*滑块的样式*/
+QSlider::groove:horizontal {
+margin:0 -6 0 -6;
+padding:0;
+border:0;
+
+background: rgba(200,200,200,70);
+height: 3px;
+
+}
+
+QSlider::groove:horizontal:hover {
+margin:0 -6 0 -6;
+padding:0;
+border:0;
+background: rgba(200,200,200,70);
+height: 6px;
+
+}
+/*滑块经过的颜色:前面的颜色*/
+QSlider::sub-page:horizontal {
+background: rgb(255, 102, 153);
+margin:0;
+padding:0;
+border-radius: 3px;
+}
+
+QSlider::handle:horizontal 
+{
+    background: rgba(0,0,0,0);
+    width: 6px;
+    margin-top: -3px;
+    margin-bottom: -3px;
+
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 6px;
+	border：none;
+}
+
+
+QSlider::handle:horizontal:hover {
+    background: rgb(255, 102, 153);
+    width: 6px;
+    margin-top: -3px;
+    margin-bottom: -3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 6px;
+	border：none;
+}</string>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

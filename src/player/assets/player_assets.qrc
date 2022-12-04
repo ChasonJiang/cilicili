@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="play_control_bar">
+    <file>mute_btn.svg</file>
+    <file>pause_btn.svg</file>
+    <file>small_screen_btn.svg</file>
+    <file>volume_btn.svg</file>
+    <file>full_screen_btn.svg</file>
+    <file>setting_btn.svg</file>
+    <file>play_btn.svg</file>
+  </qresource>
+</RCC>

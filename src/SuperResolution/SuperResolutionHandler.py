@@ -31,6 +31,7 @@ class SuperResolutionHandler(Process):
             with open(os.path.join(os.path.dirname(__file__),"SuperResolutionInferencer","SuperResolutionInferencerRegister.json"),"r") as f:
                 self.superResolutionInferencer = json.loads(f.read())
         except IOError:
+            print("Error reading SuperResolutionInferencerRegister.json")
             LOGGER.error("Error reading SuperResolutionInferencerRegister.json")
             # LOGGER.error(os.path.join(os.path.dirname(__file__),"SuperResolutionInferencer","SuperResolutionInferencerRegister.json"))
             self.srContext.msgPipe.send(SRSC.IoError)
@@ -38,39 +39,45 @@ class SuperResolutionHandler(Process):
 
 
     def run(self):
+        print("Running SuperResolutionHandler")
         while True:
             # print("polling from SuperResolutionHandler")
             # if self.inCmdPipe.poll():
             # print("recving")
-            handlerCmd:HandlerCmd =  self.srContext.msgPipe.recv() 
+            handlerCmd:HandlerCmd =  self.srContext.cmdPipe.recv() 
+            print(f"recving cmd: {handlerCmd.cmd} | args: {handlerCmd.args}")
             if handlerCmd.cmd == HandlerCmd.Quit:
-                self.quitThread()
+                self.quitInferencer()
                 break
-            elif handlerCmd.cmd == HandlerCmd.Start:
+            elif handlerCmd.cmd == HandlerCmd.Switch:
+                self.quitInferencer()
+                args = handlerCmd.args
+                print("Switch inferencer")
                 inferencer = None
-                if handlerCmd.args == None:
-                    inferencer = self.loadInferencer(
-                        self.superResolutionInferencer["SuperResolutionInferencer"]["default"]["ClassName"],
-                        self.superResolutionInferencer["SuperResolutionInferencer"]["default"]["ClassPath"]
+                # if handlerCmd.args == None:
+                #     inferencer = self.loadInferencer(
+                #         self.superResolutionInferencer["SuperResolutionInferencer"]["default"]["ClassName"],
+                #         self.superResolutionInferencer["SuperResolutionInferencer"]["default"]["ClassPath"]
+                #         )
+                # else:
+                inferencer = self.loadInferencer(
+                        self.superResolutionInferencer["SuperResolutionInferencer"][args]["ClassName"],
+                        self.superResolutionInferencer["SuperResolutionInferencer"][args]["ClassPath"]
                         )
-                else:
-                    inferencer = self.loadInferencer(
-                            self.superResolutionInferencer["SuperResolutionInferencer"][handlerCmd.args]["ClassName"],
-                            self.superResolutionInferencer["SuperResolutionInferencer"][handlerCmd.args]["ClassPath"]
-                            )
-                self.srWorker = SRWorker(inferencer,self.srContext.inputDataPipe, self.srContext.outputDataPipe)
+                self.srWorker = SRWorker(inferencer, self.srContext)
                 self.srThread = QThread()
                 self.srWorker.moveToThread(self.srThread)
                 self.srThread.started.connect(self.srWorker.inference)
                 self.srThread.finished.connect(self.srWorker.quit)
                 self.srThread.start()
-                self.srContext.outputDataPipe.send(SRSC.InferencerStarted)
+                # self.srContext.msgPipe.send(SRSC.InferencerStarted)
 
     
 
-    def quitThread(self):
-        # if self.srWorker is not None:
-        #     self.srWorker.quit()
+    def quitInferencer(self):
+        LOGGER.debug("Quit Inferencer")
+        if self.srWorker is not None:
+            self.srWorker.quit()
         if self.srThread is not None:
             self.srThread.quit()
             self.srThread.wait()

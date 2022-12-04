@@ -42,11 +42,12 @@ class CiliCiliPlayer(QWidget):
     def play(self, media_info=None):
 
         self.playThread = QThread()
-        self.playWorker = PlayWorker(self.displayLayer,self.audioDevice)
+        self.playWorker = PlayWorker(self.displayLayer,self.audioDevice,self.srContext)
         self.playWorker.moveToThread(self.playThread)
         self.playWorker.send_duration_time.connect(self.playerControlLayer.setDurationTime)
         self.playWorker.update_playback_progress.connect(self.playerControlLayer.updatePlayProgress)
         self.playerControlLayer.seek_to.connect(self.playWorker.seek)
+        self.playerControlLayer.switch_sr_mode.connect(self.playWorker.enableSR)
         self.playThread.started.connect(lambda:self.playWorker.play(media_info))
         self.playThread.start()
         self.playStatus = True

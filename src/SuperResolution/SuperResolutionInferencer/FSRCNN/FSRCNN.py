@@ -2,7 +2,7 @@
 from multiprocessing.connection import PipeConnection
 from time import sleep
 from SuperResolution.Inferencer import Inferencer
-
+import numpy as np
 
 class FSRCNN(Inferencer):
     def __init__(self,):
@@ -12,5 +12,6 @@ class FSRCNN(Inferencer):
         print("FSRCNN process image ...")
         frame=in_pipe.recv()
         out_pipe.send(frame)
-        sleep(0.001)
+        # sleep(0.001)
+        return True
         # sleep(1)

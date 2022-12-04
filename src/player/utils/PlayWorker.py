@@ -34,7 +34,7 @@ class PlayWorker(QObject):
     shutdown_signal = pyqtSignal()
 
     
-    def __init__(self, videoDevice, audioDevice, vQueueSize=10,aQueueSize=10):
+    def __init__(self, videoDevice, audioDevice, srContext=None,vQueueSize=10,aQueueSize=10):
         super(PlayWorker, self).__init__()
         LOGGER.info("init PlayWorker")
         self.videoDevice = videoDevice
@@ -43,11 +43,8 @@ class PlayWorker(QObject):
         self.aQueueSize = aQueueSize
         self.isFirstLoad = True
         self.shutdown_signal.connect(self.shutdown)
-        self.enable_rtsr = True
-        self.srCmdPipe = None
-        self.srMsgPipe = None
-        self.srInputDataPipe = None
-        self.srOutputDataPipe = None
+        self.enable_rtsr = False
+        self.srContext = srContext
 
 
 
@@ -208,11 +205,11 @@ class PlayWorker(QObject):
         self.rtsrThread.started.connect(self.rtsrWorker.work)
         self.rtsrThread.start()
 
-    def play_slice(self, slice_index:int, ss:int, base_pts:int=0):
+    def play_slice(self, slice_index:int, ss:int, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
         # LOGGER.info("playLocker locked")
         # print("play_slice is {}".format(QThread.currentThreadId()))  
 
-        self.init_slice(slice_index,ss,base_pts)
+        self.init_slice(slice_index,ss,base_pts,sr_mode,sr_context)
         self.updatePlaybackProgressTimerThread = QThread()
         self.updatePlaybackProgressTimer = QTimer()
         self.updatePlaybackProgressTimer.setInterval(500)
@@ -227,10 +224,10 @@ class PlayWorker(QObject):
 
 
 
-    def init_slice(self, slice_index, ss:int, base_pts:int=0):
+    def init_slice(self, slice_index, ss:int, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
         if self.videoContextList is not None:
             self.videoPlayWorker.set_frame_rate.emit(self.videoContextList[slice_index].frame_rate)
-            self.vdecode_worker_init(self.videoContextList[slice_index],ss,base_pts)
+            self.vdecode_worker_init(self.videoContextList[slice_index],ss,base_pts,sr_mode,sr_context)
 
         if self.audioContextList is not None:
             self.audioPlayWorker.set_frame_rate.emit(self.audioContextList[slice_index].frame_rate)
@@ -247,10 +244,10 @@ class PlayWorker(QObject):
             LOGGER.info("ADecodeThread started")
         # self.avPlayThread.start()
 
-    def vdecode_worker_init(self,vContext:VideoContext, ss:int=0, base_pts:int=0):
+    def vdecode_worker_init(self,vContext:VideoContext, ss:int=0, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
         LOGGER.info("run vdecode_worker_init")
         self.videoDecodeThread = QThread()
-        self.videoDecodeWorker = VideoDecodeWorker(vContext, self.videoFrameBufferQueue, ss,base_pts)
+        self.videoDecodeWorker = VideoDecodeWorker(vContext, self.videoFrameBufferQueue, ss,base_pts,sr_mode,sr_context)
         self.videoDecodeWorker.moveToThread(self.videoDecodeThread)
         # self.videoDecodeWorker.buffer_queue_full_signal.connect(self.videoStatusNeuron.inTwo)
         self.videoDecodeWorker.buffer_queue_full_signal.connect(self.playStatusController.video_buffer_full_slot)
@@ -361,7 +358,7 @@ class PlayWorker(QObject):
             if self.videoPlayWorker is not None:
                 self.videoPlayWorker.pause_signal.emit()
 
-    def seek(self,ss:int):
+    def seek(self,ss:int, sr_mode:str=None, sr_context:SRContext=None):
         # self.wait_buffer_signal.emit()
         self.quit_timer()
         self.quit_avdecode()
@@ -382,9 +379,15 @@ class PlayWorker(QObject):
         self.videoPlayWorker.frame_last_pts = ss 
         self.play_clock.curr_ts = ss
         
-        self.play_slice(slice_index, ts, self.lastDurationTime)
+        self.play_slice(slice_index, ts, self.lastDurationTime,sr_mode,sr_context)
 
     
+    def enableSR(self, sr_mode:str):
+        assert self.srContext is not None
+        self.seek(self.play_clock.curr_ts,sr_mode,self.srContext)
+    
+    def disableSR(self):
+        self.seek(self.play_clock.curr_ts)
 
 
     def convert2slice_ts(self,ss:int):
@@ -435,14 +438,14 @@ class PlayWorker(QObject):
         if self.videoDecodeThread is not None:
             LOGGER.debug("quit video decode thread")
             self.videoDecodeThread.quit()
-            self.videoDecodeThread.wait(2000)
+            self.videoDecodeThread.wait()
             # self.videoDecodeThread.terminate()
             self.videoDecodeThread = None
 
         if self.audioDecodeThread is not None:
             LOGGER.debug("quit audio decode thread")
             self.audioDecodeThread.quit()
-            self.audioDecodeThread.wait(2000)
+            self.audioDecodeThread.wait()
             # self.audioDecodeThread.terminate()
             self.audioDecodeThread = None
 

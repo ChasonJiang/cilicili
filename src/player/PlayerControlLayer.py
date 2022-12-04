@@ -17,6 +17,7 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     upadte_play_progress = pyqtSignal(int)
     set_duration_time = pyqtSignal(int)
     seek_to = pyqtSignal(int)
+    switch_sr_mode = pyqtSignal(str)
 
     def __init__(self,parent=None):
         super(PlayerControlLayer, self).__init__(parent)
@@ -31,7 +32,13 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
         self.playControlBar.installEventFilter(self)
         self.playControlBar.hide()
         self.playStatusBar.hide()
+        
 
+        ###### sr control ######
+        self.superResolutionButton.setCheckable(True)
+        self.superResolutionButton.clicked[bool].connect(self.switchSRMode)
+        
+        ###### play control ######
         self.isShow = False
         self.playButton.setCheckable(True)
         self.playButton.clicked[bool].connect(self.switchPlayState)
@@ -71,6 +78,11 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     def switchPlayState(self,state:bool):
         self.playState = not state
         self.switch_play_state.emit(self.playState)
+
+    def switchSRMode(self,state:bool):
+
+        self.switch_sr_mode.emit("FSRCNN")
+
 
     def updatePlayProgress(self,t:int):
         self.seekSlider.setValue(t)

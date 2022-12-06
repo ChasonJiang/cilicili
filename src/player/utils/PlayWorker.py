@@ -74,6 +74,8 @@ class PlayWorker(QObject):
         self.durationTime = 0.0
         self.lastDurationTime = 0.0
         self.sliceDurationTimeList = None
+
+        self.sr_mode = None
         # self.play_clock.upadte_progress.connect(self.update_progress)
 
         self.bufferLocker = QMutex()
@@ -109,7 +111,7 @@ class PlayWorker(QObject):
             self.init_avPlayWorker()
             # if self.enable_rtsr:
             #     self.init_rtstWorker()
-            self.play_slice(self.curr_slice_index, 0)
+            self.play_slice(self.curr_slice_index, 0,0, self.sr_mode,sr_context=self.srContext)
         except Exception as e:
             LOGGER.error(e.with_traceback())
             self.shutdown()
@@ -224,7 +226,7 @@ class PlayWorker(QObject):
 
 
 
-    def init_slice(self, slice_index, ss:int, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
+    def init_slice(self, slice_index:int, ss:int, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
         if self.videoContextList is not None:
             self.videoPlayWorker.set_frame_rate.emit(self.videoContextList[slice_index].frame_rate)
             self.vdecode_worker_init(self.videoContextList[slice_index],ss,base_pts,sr_mode,sr_context)
@@ -289,7 +291,7 @@ class PlayWorker(QObject):
             self.lastDurationTime += self.sliceDurationTimeList[self.curr_slice_index-1]
             self.videoPlayWorker.frame_last_pts = self.lastDurationTime 
             self.play_clock.curr_ts = self.lastDurationTime
-            self.play_slice(self.curr_slice_index, 0,self.lastDurationTime)
+            self.play_slice(self.curr_slice_index, 0,self.lastDurationTime,self.sr_mode,sr_context=self.srContext)
         else:
             
             # 发送退出信号，播放完成后退出
@@ -316,7 +318,7 @@ class PlayWorker(QObject):
         self.playEndStatus = False
         self.play_clock = PlayClock()
         self.init_avPlayWorker()
-        self.play_slice(self.curr_slice_index, 0)
+        self.play_slice(self.curr_slice_index, 0,sr_context=self.srContext)
 
             
 
@@ -358,7 +360,7 @@ class PlayWorker(QObject):
             if self.videoPlayWorker is not None:
                 self.videoPlayWorker.pause_signal.emit()
 
-    def seek(self,ss:int, sr_mode:str=None, sr_context:SRContext=None):
+    def seek(self,ss:int,):
         # self.wait_buffer_signal.emit()
         self.quit_timer()
         self.quit_avdecode()
@@ -379,14 +381,16 @@ class PlayWorker(QObject):
         self.videoPlayWorker.frame_last_pts = ss 
         self.play_clock.curr_ts = ss
         
-        self.play_slice(slice_index, ts, self.lastDurationTime,sr_mode,sr_context)
+        self.play_slice(slice_index, ts, self.lastDurationTime,self.sr_mode,sr_context=self.srContext)
 
     
     def enableSR(self, sr_mode:str):
-        assert self.srContext is not None
-        self.seek(self.play_clock.curr_ts,sr_mode,self.srContext)
+        # assert self.srContext is not None
+        self.sr_mode = sr_mode
+        self.seek(self.play_clock.curr_ts)
     
     def disableSR(self):
+        self.sr_mode = None
         self.seek(self.play_clock.curr_ts)
 
 

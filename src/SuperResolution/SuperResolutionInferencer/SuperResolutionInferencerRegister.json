@@ -1,5 +1,5 @@
 {
-    "SuperResolutionInferencer":{
+    "Inferencer":{
         "FSRCNN":{
             "ClassName":"FSRCNN",
             "ClassPath":"FSRCNN.FSRCNN"

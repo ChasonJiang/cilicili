@@ -4,6 +4,9 @@ from multiprocessing.connection import PipeConnection
 import os
 from time import sleep
 from PyQt5.QtCore import *
+# from PyQt5.QtGui import *
+# from PyQt5.QtWidgets import *
+from threading import Thread
 import ffmpeg
 import numpy as np
 from SuperResolution.ClassLoader import classloader
@@ -16,7 +19,8 @@ from .Inferencer import Inferencer
 from .SRStatusCode import SRStatusCode as SRSC
 LOGGER=logging.getLogger()
 
-class SRWorker(QObject):
+# class SRWorker(QObject):
+class SRWorker(Thread):
     def __init__(self,decoderContext,sr_context):
         super(SRWorker, self).__init__()
         self._isQuit = False
@@ -57,10 +61,11 @@ class SRWorker(QObject):
     def quit(self):
         self._isQuit = True
 
-
-    def work(self):
+    # def work(self):
+    def run(self):
         # print("thread id of VideoDecodeWorker is {}".format(QThread.currentThreadId()))   
         # print("VideoDecodeWorker run work")
+        
         try:
             self.decoder = self.init_decoder(self.video_context,self.ss)
         except :
@@ -78,9 +83,11 @@ class SRWorker(QObject):
 
         self.sr_context.msgPipe.send(SRSC.DecoderInitSuccess)
         self.process(self.video_context)
+        
 
 
     def process(self, video_context:VideoContext):
+        
         frame_size = video_context.frame_width \
             * video_context.frame_height \
             * video_context.frame_channels
@@ -110,8 +117,9 @@ class SRWorker(QObject):
 
                 if self.sr_mode is not None:
                     frame = self.inferencer.process(frame)
+                    self.sr_context.outputDataPipe.send(frame)
 
-                if frame is not None:
+                else :
                     self.sr_context.outputDataPipe.send(frame)
 
         except:
@@ -122,6 +130,7 @@ class SRWorker(QObject):
             self.decoder.stdout.close()
             self.decoder.wait()
             
+        
     
 
 

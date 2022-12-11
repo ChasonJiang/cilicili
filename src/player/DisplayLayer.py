@@ -52,6 +52,7 @@ class DisplayLayer(QWidget):
                 mode(str): mode to be displayed. 
         """
         height, width, _ = self.curr_frame.shape
+        # print(self.curr_frame.shape)
         if aspectRatio == -1:
             aspectRatio = 1.0 * width / height
         if mode == "auto":

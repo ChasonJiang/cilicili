@@ -2,8 +2,12 @@ import json
 import logging
 from multiprocessing.connection import PipeConnection
 import os
+import sys
+from threading import Thread
 from time import sleep
+from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 from multiprocessing import Pipe, Process
 
 from .SRContext import SRContext
@@ -25,6 +29,7 @@ class SuperResolutionHandler(Process):
         self.srContext = srContext
         self.srThread = None
         self.srWorker = None
+        self.eventLoop = None
 
 
     def run(self):
@@ -33,27 +38,43 @@ class SuperResolutionHandler(Process):
             # print("polling from SuperResolutionHandler")
             # if self.inCmdPipe.poll():
             # print("recving")
+            
             handlerCmd:HandlerCmd =  self.srContext.cmdPipe.recv() 
             # print(f"recving cmd: {handlerCmd.cmd} | args: {handlerCmd.args}")
             if handlerCmd.cmd == HandlerCmd.Quit:
                 # self.quitSRWorker()
                 break
             elif handlerCmd.cmd == HandlerCmd.Start:
-                self.quitSRWorker()
+                # self.quitEventLoop()
+                # self.quitSRWorker()
+                
+                
                 decoderContext = handlerCmd.args
+                # sr = QApplication(sys.argv)
                 self.srWorker = SRWorker(decoderContext,self.srContext)
-                self.srThread = QThread()
-                self.srWorker.moveToThread(self.srThread)
-                self.srThread.started.connect(self.srWorker.work)
+                self.srWorker.setDaemon(True)
+                self.srWorker.start()
+                # self.srThread = QThread()
+                # self.srWorker.moveToThread(self.srThread)
+                # self.srThread.started.connect(self.srWorker.work)
                 # self.srThread.finished.connect(self.srWorker.quit)
-                self.srThread.start()
+                # self.eventLoop = QEventLoop()
+                # self.srThread.start()
+                # sr.exec_()
+                # self.eventLoop.exec()
+                
             elif handlerCmd.cmd == HandlerCmd.QuitSRWorker:
+                # self.quitEventLoop()
                 self.quitSRWorker()
                 continue
             elif handlerCmd.cmd == HandlerCmd.QuitSRThread:
-                self.quitSRThread()
+                
+                # self.quitSRThread()
                 continue
     
+    def quitEventLoop(self):
+        if self.eventLoop is not None:
+            self.eventLoop.quit()
 
     def quitSRWorker(self):
         # print("Quit Inferencer")

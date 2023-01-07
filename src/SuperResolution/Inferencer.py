@@ -1,3 +1,6 @@
+# from queue import Queue
+from multiprocessing import Queue
+# from torch.multiprocessing import Queue
 from PyQt5.QtCore import *
 # from abc import abstractmethod, ABCMeta
 # from multiprocessing.connection import PipeConnection
@@ -9,5 +12,5 @@ from PyQt5.QtCore import *
 
 class Inferencer(QObject):
     
-    def process(self, frame):
+    def process(self, frame_buffer_queue:Queue):
         pass

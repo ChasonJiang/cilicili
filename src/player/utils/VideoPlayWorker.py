@@ -80,12 +80,13 @@ class VideoPlayWorker(QObject):
     def forcedQuit(self):
         self.forced_quit = True
 
-    def delay_ms(self, t:float):
+    def delay_ms(self, t:int):
         eventLoop=QEventLoop()
         QTimer.singleShot(t,eventLoop.quit)
         eventLoop.exec()
         
     def play(self):
+    # def play_bak(self):
         # assert self.curr_frame_rate is not None
         # print("thread id of VideoPlayWorker is {}".format(QThread.currentThreadId()))
         while True:
@@ -173,3 +174,49 @@ class VideoPlayWorker(QObject):
         LOGGER.debug("VideoPlayWorker quit")
         self.quit_signal.emit(True)
 
+
+    # def play(self):
+    def play_test(self):
+        # assert self.curr_frame_rate is not None
+        # print("thread id of VideoPlayWorker is {}".format(QThread.currentThreadId()))
+        while True:
+            if self._isQuit and self.buffer_queue.empty():
+                break
+            if self.forced_quit:
+                # 防止decoder因缓冲队满而阻塞,导致无法正常退出
+                if self.buffer_queue.full():
+                    self.buffer_queue.get_nowait()
+                    self.buffer_queue.get_nowait()
+                break
+
+            self.mutex.lock()
+            if self.buffer_queue.empty():
+                self.wait_buffer_signal.emit("display_device")
+                LOGGER.debug("Video frame queue is empty")
+                self._isPause = True
+
+            if self._isPause:
+                LOGGER.debug("VideoPlayWorker paused")
+                # 使用QWaitCondition阻塞时，os调用wait_block的“瞬间”会释放mutex
+                self.cond.wait(self.mutex)
+
+                if self._isQuit and self.buffer_queue.empty():
+                    break
+                if self.forced_quit:
+                    # 防止decoder因缓冲队满而阻塞,导致无法正常退出
+                    if self.buffer_queue.full():
+                        self.buffer_queue.get_nowait()
+                        self.buffer_queue.get_nowait()
+                    break
+
+            self.delay_ms(70)
+            print(f"video buffer queue size: {self.buffer_queue.qsize()}")
+            buffer = self.buffer_queue.get(block=True)
+
+            self.display_device.update(buffer["data"])
+
+            self.mutex.unlock()
+
+        LOGGER.debug("The frame loss rate of this video is {:.2f} %".format((1.0*self.drop_frame_counter/self.frame_counter)*100))
+        LOGGER.debug("VideoPlayWorker quit")
+        self.quit_signal.emit(True)

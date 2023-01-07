@@ -75,7 +75,7 @@ class PlayWorker(QObject):
         self.lastDurationTime = 0.0
         self.sliceDurationTimeList = None
 
-        self.sr_mode = None
+        self.sr_mode = False
         # self.play_clock.upadte_progress.connect(self.update_progress)
 
         self.bufferLocker = QMutex()
@@ -207,7 +207,7 @@ class PlayWorker(QObject):
         self.rtsrThread.started.connect(self.rtsrWorker.work)
         self.rtsrThread.start()
 
-    def play_slice(self, slice_index:int, ss:int, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
+    def play_slice(self, slice_index:int, ss:int, base_pts:int=0, sr_mode:bool=False, sr_context:SRContext=None):
         # LOGGER.info("playLocker locked")
         # print("play_slice is {}".format(QThread.currentThreadId()))  
 
@@ -226,7 +226,7 @@ class PlayWorker(QObject):
 
 
 
-    def init_slice(self, slice_index:int, ss:int, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
+    def init_slice(self, slice_index:int, ss:int, base_pts:int=0, sr_mode:bool=False, sr_context:SRContext=None):
         if self.videoContextList is not None:
             self.videoPlayWorker.set_frame_rate.emit(self.videoContextList[slice_index].frame_rate)
             self.vdecode_worker_init(self.videoContextList[slice_index],ss,base_pts,sr_mode,sr_context)
@@ -246,7 +246,7 @@ class PlayWorker(QObject):
             LOGGER.info("ADecodeThread started")
         # self.avPlayThread.start()
 
-    def vdecode_worker_init(self,vContext:VideoContext, ss:int=0, base_pts:int=0, sr_mode:str=None, sr_context:SRContext=None):
+    def vdecode_worker_init(self,vContext:VideoContext, ss:int=0, base_pts:int=0, sr_mode:bool=False, sr_context:SRContext=None):
         LOGGER.info("run vdecode_worker_init")
         self.videoDecodeThread = QThread()
         self.videoDecodeWorker = VideoDecodeWorker(vContext, self.videoFrameBufferQueue, ss,base_pts,sr_mode,sr_context)
@@ -386,11 +386,11 @@ class PlayWorker(QObject):
     
     def enableSR(self, sr_mode:str):
         # assert self.srContext is not None
-        self.sr_mode = sr_mode
+        self.sr_mode = True
         self.seek(self.play_clock.curr_ts)
     
     def disableSR(self):
-        self.sr_mode = None
+        self.sr_mode = False
         self.seek(self.play_clock.curr_ts)
 
 

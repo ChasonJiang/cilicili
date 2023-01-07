@@ -26,7 +26,7 @@ class VideoDecodeWorker(QObject):
     decode_end_signal = pyqtSignal()
     vbuffer_exception_signal = pyqtSignal(int)
 
-    def __init__(self, video_context, buffer_queue, ss:int=0, base_pts=0, sr_mode=None,sr_context=None,thread_queue_size=8):
+    def __init__(self, video_context, buffer_queue, ss:int=0, base_pts=0, sr_mode:bool=False,sr_context=None,thread_queue_size=8):
         super(VideoDecodeWorker, self).__init__()
         # LOGGER.info("init VideoDecodeWorker")
         assert isinstance(video_context, VideoContext)

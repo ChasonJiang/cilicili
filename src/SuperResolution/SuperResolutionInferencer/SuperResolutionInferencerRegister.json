@@ -1,4 +1,5 @@
 {
+    "Default":"FSRCNN",
     "Inferencer":{
         "FSRCNN":{
             "ClassName":"FSRCNN",

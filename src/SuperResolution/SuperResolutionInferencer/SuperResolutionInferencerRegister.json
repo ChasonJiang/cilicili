@@ -1,9 +1,15 @@
 {
-    "Default":"FSRCNN",
+    "Default":"IMDN",
     "Inferencer":{
         "FSRCNN":{
             "ClassName":"FSRCNN",
-            "ClassPath":"FSRCNN.FSRCNN"
+            "ClassPath":"FSRCNN.FSRCNN",
+            "Multiplier":4
+        },
+        "IMDN":{
+            "ClassName":"IMDN",
+            "ClassPath":"IMDN.IMDN",
+            "Multiplier":4
         }
     }
 }

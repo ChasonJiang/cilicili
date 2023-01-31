@@ -6,13 +6,18 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from SuperResolution.HandlerCmd import HandlerCmd
+from SuperResolution.SRContext import SRContext
 
 from player.PlayerControlLayer import PlayerControlLayer
 
 from .utils.AudioDevice import AudioDevice
+from .utils.DisplayDevice import DisplayDevice
 from .DisplayLayer import DisplayLayer
 from .utils.PlayWorker import PlayWorker
 # from .assets.player_assets import *
+# import pycuda.driver
+# import pycuda.autoinit
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
 LOGGER=logging.getLogger()
@@ -22,7 +27,7 @@ class CiliCiliPlayer(QWidget):
     video_play_signal = pyqtSignal()
     play_pause_signal = pyqtSignal()
     play_resume_signal = pyqtSignal()
-    def __init__(self, parent=None,srContext=None):
+    def __init__(self, parent=None,srContext:SRContext=None):
         super(CiliCiliPlayer, self).__init__(parent=parent)
         LOGGER.info("init BasePlayer")
         self.setupUi()
@@ -47,7 +52,7 @@ class CiliCiliPlayer(QWidget):
         self.playWorker.send_duration_time.connect(self.playerControlLayer.setDurationTime)
         self.playWorker.update_playback_progress.connect(self.playerControlLayer.updatePlayProgress)
         self.playerControlLayer.seek_to.connect(self.playWorker.seek)
-        self.playerControlLayer.switch_sr_mode.connect(self.playWorker.enableSR)
+        self.playerControlLayer.switch_sr_mode.connect(self.playWorker.switchSRMode)
         self.playThread.started.connect(lambda:self.playWorker.play(media_info))
         self.playThread.start()
         self.playStatus = True
@@ -76,6 +81,7 @@ class CiliCiliPlayer(QWidget):
         if self.playThread is not None:
             self.playThread.quit()
             self.playThread.wait()
+        self.srContext.cmdPipe.send(HandlerCmd(HandlerCmd.Quit))
 
 
 
@@ -112,7 +118,8 @@ class CiliCiliPlayer(QWidget):
         self.setStyleSheet("*{\n"
                             "background-color: rgba(0,0,0,0);\n"
                             "}")
-        self.displayLayer=DisplayLayer(self)
+        # self.displayLayer=DisplayLayer(self)
+        self.displayLayer=DisplayDevice(self)
         self.playerControlLayer=PlayerControlLayer(self)
         self.horizontalLayout = QHBoxLayout(self)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)

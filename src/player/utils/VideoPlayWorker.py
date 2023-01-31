@@ -5,10 +5,12 @@ import time
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import torch
 
 from Tools.Delay import delay_ns
 from player.utils.PlayClock import PlayClock
 from ..DisplayLayer import DisplayLayer
+from .DisplayDevice import DisplayDevice
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
 LOGGER=logging.getLogger()
 
@@ -24,7 +26,7 @@ class VideoPlayWorker(QObject):
     def __init__(self,display_device, buffer_queue, play_clock):
         super(VideoPlayWorker, self).__init__()
         LOGGER.info("init VideoPlayWorker")
-        assert isinstance(display_device,DisplayLayer)
+        assert isinstance(display_device,DisplayLayer) or isinstance(display_device,DisplayDevice)
         assert isinstance(buffer_queue,Queue)
         assert isinstance(play_clock,PlayClock)
         self.display_device=display_device
@@ -162,7 +164,15 @@ class VideoPlayWorker(QObject):
             # LOGGER.debug("video actual_delay {} ms".format(actual_delay))
             if not self.drop_frame_flag:
                 self.delay_ms(actual_delay)
-                self.display_device.update(buffer["data"])
+                data= buffer["data"]
+                if isinstance(data,torch.Tensor):
+                    self.display_device.update_signal_tensor.emit(data)
+                #     data=data.cuda()
+                #     torch.cuda.synchronize()
+                #     print(data.device)
+                # self.display_device.update(data)
+                else:
+                    self.display_device.update_signal_np.emit(data)
             else:
                 self.drop_frame_counter+=1
                 self.drop_frame_flag = False

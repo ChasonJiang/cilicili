@@ -4,7 +4,13 @@ from time import sleep
 from PyQt5.QtCore import *
 from SuperResolution.SRContext import SRContext
 from Tools.BinaryNeuron import BinaryNeuron
+from player.utils.DisplayDevice import DisplayDevice
 from player.utils.RTSRWorker import RTSRWorker
+
+# import pycuda.driver
+# # import pycuda.gl.autoinit
+# from player.utils.CudaAutoInit import *
+# import pycuda.gl
 
 # from player.utils.AVPlayWorker import AVPlayWorker
 from .PlayStatusController import PlayStatusController
@@ -34,7 +40,7 @@ class PlayWorker(QObject):
     shutdown_signal = pyqtSignal()
 
     
-    def __init__(self, videoDevice, audioDevice, srContext=None,vQueueSize=10,aQueueSize=10):
+    def __init__(self, videoDevice:DisplayDevice, audioDevice, srContext=None,vQueueSize=10,aQueueSize=10):
         super(PlayWorker, self).__init__()
         LOGGER.info("init PlayWorker")
         self.videoDevice = videoDevice
@@ -154,6 +160,7 @@ class PlayWorker(QObject):
                                             req_params=mediaInfo.req_params,
                                             req_data=mediaInfo.req_data
                                             )
+                videoContext.frame_rate=20.0
                 self.videoContextList.append(videoContext)
             except:
                 self.exceptionStatus = True
@@ -210,6 +217,13 @@ class PlayWorker(QObject):
     def play_slice(self, slice_index:int, ss:int, base_pts:int=0, sr_mode:bool=False, sr_context:SRContext=None):
         # LOGGER.info("playLocker locked")
         # print("play_slice is {}".format(QThread.currentThreadId()))  
+
+        # if sr_mode:
+        #     vcontext:VideoContext = self.videoContextList[slice_index]
+        #     # self.videoDevice.setup([vcontext.frame_width*4,vcontext.frame_height*4])
+        #     self.videoDevice.setup_signal.emit([vcontext.frame_width*4,vcontext.frame_height*4])
+        #     # self.videoDevice.setup_signal.emit([1920,1080])
+        #     self.videoDevice.playOnCuda()
 
         self.init_slice(slice_index,ss,base_pts,sr_mode,sr_context)
         self.updatePlaybackProgressTimerThread = QThread()
@@ -383,8 +397,13 @@ class PlayWorker(QObject):
         
         self.play_slice(slice_index, ts, self.lastDurationTime,self.sr_mode,sr_context=self.srContext)
 
-    
-    def enableSR(self, sr_mode:str):
+    def switchSRMode(self,state:bool):
+        if state:
+            self.enableSR()
+        else:
+            self.disableSR()
+
+    def enableSR(self,):
         # assert self.srContext is not None
         self.sr_mode = True
         self.seek(self.play_clock.curr_ts)

@@ -4,12 +4,13 @@ from multiprocessing.connection import PipeConnection
 import os
 # from queue import 
 import sys
+# import torch
 from threading import Thread
 from time import sleep
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from multiprocessing import Pipe, Process, Queue
+from torch.multiprocessing import Pipe, Process, Queue
 from .ClassLoader import classLoader
 
 from .VideoDecoder import VideoDecoder
@@ -56,7 +57,9 @@ class SuperResolutionHandler(Process):
             handlerCmd:HandlerCmd =  self.srContext.cmdPipe.recv() 
             # print(f"recving cmd: {handlerCmd.cmd} | args: {handlerCmd.args}")
             if handlerCmd.cmd == HandlerCmd.Quit:
-                # self.quitSRWorker()
+                self.quitVideoDecoder()
+                self.quitSRWorker()
+                self.clearFrameBuffer()
                 break
             elif handlerCmd.cmd == HandlerCmd.Start:
                 decoderContext = handlerCmd.args
@@ -84,19 +87,20 @@ class SuperResolutionHandler(Process):
                 continue
 
     def clearFrameBuffer(self):
+        # print("clearFrameBuffer")
         if self.frameBufferQueue is not None:
             while not self.frameBufferQueue.empty():
                 self.frameBufferQueue.get_nowait()
 
 
     def quitVideoDecoder(self):
-        # print("Quit Inferencer")
+        # print("quitVideoDecoder")
         if self.videoDecoder is not None:
             print("quit videoDecoder")
             self.videoDecoder.quit()
 
     def quitSRWorker(self):
-        # print("Quit Inferencer")
+        # print("quitSRWorker")
         if self.srWorker is not None:
             print("quit srWorker")
             self.srWorker.quit()

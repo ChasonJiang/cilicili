@@ -17,11 +17,15 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     upadte_play_progress = pyqtSignal(int)
     set_duration_time = pyqtSignal(int)
     seek_to = pyqtSignal(int)
-    switch_sr_mode = pyqtSignal(str)
+    switch_sr_mode = pyqtSignal(bool)
 
     def __init__(self,parent=None):
         super(PlayerControlLayer, self).__init__(parent)
         self.setWindowFlag(Qt.FramelessWindowHint, True)
+        # self.setStyleSheet("*{\n"
+        #                     "background-color: rgba(0,0,0,0);\n"
+        #                     "}")
+
         self.setAttribute(Qt.WA_DeleteOnClose)
         # self.setAttribute(Qt.WA_Hover, True)
         self.size_follow_parent.connect(self.sizeFollowParent)
@@ -54,6 +58,8 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
         self.upadte_play_progress.connect(self.updatePlayProgress)
         self.set_duration_time.connect(self.setDurationTime)
 
+        self.srmode = False
+
     def eventFilter(self, widget:QObject, event:QEvent) -> bool:
         # print(event)
         evet_type = event.type()
@@ -80,8 +86,7 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
         self.switch_play_state.emit(self.playState)
 
     def switchSRMode(self,state:bool):
-
-        self.switch_sr_mode.emit("FSRCNN")
+        self.switch_sr_mode.emit(state)
 
 
     def updatePlayProgress(self,t:int):

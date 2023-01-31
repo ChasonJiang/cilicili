@@ -1,8 +1,11 @@
 
-from multiprocessing import Process
-from multiprocessing import Pipe
+# from multiprocessing import Process
+# from multiprocessing import Pipe
+from torch.multiprocessing import Process
+from torch.multiprocessing import Pipe
 import sys
 import logging
+import torch
 from time import sleep
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -11,8 +14,40 @@ from SuperResolution.SRContext import SRContext
 from SuperResolution.SuperResolutionHandler import SuperResolutionHandler
 from player.utils.MediaInfo import MediaInfo
 from player.CiliCiliPlayer import CiliCiliPlayer
+# torch.cuda.init()
+# import pycuda.driver
+# pycuda.driver.init()
+# import pycuda.autoinit
+
+# import pycuda.driver as cuda
+# import atexit
+
+# # Initialize CUDA
+# cuda.init()
+
+# from pycuda.tools import make_default_context  # noqa: E402
+
+# global cuda_context
+# cuda_context = make_default_context()
+# device = cuda_context.get_device()
+
+# print(cuda_context)
+# def _finish_up():
+#     global cuda_context
+#     cuda_context.pop()
+#     cuda_context = None
+
+#     from pycuda.tools import clear_context_caches
+
+#     clear_context_caches()
 
 
+# atexit.register(_finish_up)
+
+# import pycuda.driver
+# # import pycuda.gl.autoinit
+# from player.utils.CudaAutoInit import *
+# import pycuda.gl
 
 
 # def RTSR(srh_srContext):
@@ -26,11 +61,14 @@ from player.CiliCiliPlayer import CiliCiliPlayer
 
 
 def Application(args:list):
+    
+
+
     logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.DEBUG, force=True) # DEBUG
     # media_info = MediaInfo([vurl],[vurl],"network")
     # media_info=MediaInfo(["assets\\5s.mkv", "assets\\5s.mkv"],["assets\\5s.mkv", "assets\\5s.mkv"],"file")
     # media_info = MediaInfo([r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],[r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],"file")
-    media_info = MediaInfo(["assets\\360p.mkv"],["assets\\360p.mkv"],"file")
+    media_info = MediaInfo(["assets\\360p_all.mkv"],["assets\\360p_all.mkv"],"file")
     srContext = args
     app = QApplication(sys.argv)
     # player = BasePlayer()
@@ -44,6 +82,7 @@ def Application(args:list):
 
 
 def start():
+
     inCmdPipe,outCmdPipe = Pipe(True)
     inMsgPipe,outMsgPipe = Pipe(True)
     srh_outDataPipe,app_inDataPipe = Pipe(True)
@@ -63,4 +102,7 @@ def start():
 
 
 if __name__ == '__main__':
+
+    torch.multiprocessing.set_start_method('spawn', force=True)
+
     start()

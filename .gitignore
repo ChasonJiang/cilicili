@@ -10,3 +10,4 @@
 /**/**/**/__pycache__
 /**/**/**/**/__pycache__
 /src/SuperResolution/__pycache__
+*.pyc

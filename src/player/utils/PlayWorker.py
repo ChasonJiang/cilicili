@@ -27,6 +27,7 @@ from .VideoPlayWorker  import VideoPlayWorker
 LOGGER=logging.getLogger()
 
 class PlayWorker(QObject):
+    play_signal = pyqtSignal(MediaInfo)
     play_pause_signal = pyqtSignal()
     play_resume_signal = pyqtSignal()
     play_end_signal = pyqtSignal()
@@ -37,7 +38,7 @@ class PlayWorker(QObject):
     buffer_ok_signal = pyqtSignal()
     media_info_exception_signal = pyqtSignal(str)
     send_duration_time = pyqtSignal(int)
-    shutdown_signal = pyqtSignal()
+    shutdown_signal = pyqtSignal(bool)
 
     
     def __init__(self, videoDevice:DisplayDevice, audioDevice, srContext=None,vQueueSize=10,aQueueSize=10):
@@ -51,6 +52,8 @@ class PlayWorker(QObject):
         self.shutdown_signal.connect(self.shutdown)
         self.enable_rtsr = False
         self.srContext = srContext
+        self.inited = False
+        self.play_signal.connect(self.play)
 
 
 
@@ -69,6 +72,7 @@ class PlayWorker(QObject):
         self.audioPlayWorker = None
         self.videoContextList = None
         self.audioContextList = None
+        self.updatePlaybackProgressTimerThread = None
         self.updatePlaybackProgressTimer = None
         self.play_pause_signal.connect(self.pause)
         self.play_resume_signal.connect(self.resume)
@@ -103,6 +107,8 @@ class PlayWorker(QObject):
         # self.playStatusNeuron.outStatus.connect(self.play_wait_buffer_slot)
         self.playEndStatusNeuron.outStatus.connect(self.check_play_end)
         self.exceptionStatus = False
+
+        self.inited = True
 
     def play(self, mediaInfo:MediaInfo):
         # print("play is {}".format(QThread.currentThreadId()))  
@@ -160,7 +166,7 @@ class PlayWorker(QObject):
                                             req_params=mediaInfo.req_params,
                                             req_data=mediaInfo.req_data
                                             )
-                videoContext.frame_rate=20.0
+                # videoContext.frame_rate=20.0
                 self.videoContextList.append(videoContext)
             except:
                 self.exceptionStatus = True
@@ -507,6 +513,8 @@ class PlayWorker(QObject):
     def shutdown(self,force:bool=False):
         # if self.updatePlaybackProgressTimer is not None:
         #     self.updatePlaybackProgressTimer.stop()
+        if not self.inited:
+            return
         self.quit_timer()
         self.quit_avplay_worker(force)
         self.quit_avdecode()

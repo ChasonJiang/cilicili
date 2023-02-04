@@ -3,7 +3,7 @@ from time import mktime, strptime
 import traceback
 import ffmpeg
 
-from Tools.HHMMSS2ms import HHMMSS2ms
+from .HHMMSS2ms import HHMMSS2ms
 
 LOGGER=logging.getLogger()
 

@@ -6,6 +6,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from .utils.MediaInfo import MediaInfo
 from SuperResolution.HandlerCmd import HandlerCmd
 from SuperResolution.SRContext import SRContext
 
@@ -27,24 +28,29 @@ class CiliCiliPlayer(QWidget):
     video_play_signal = pyqtSignal()
     play_pause_signal = pyqtSignal()
     play_resume_signal = pyqtSignal()
+    player_init_signal = pyqtSignal()
+
     def __init__(self, parent=None,srContext:SRContext=None):
         super(CiliCiliPlayer, self).__init__(parent=parent)
         LOGGER.info("init BasePlayer")
         self.setupUi()
         self.playerControlLayer.switch_play_state.connect(self.switchPlayState)
         self.playerControlLayer.show_full_screen.connect(self.switchFullScreen)
+        self.player_init_signal.connect(self.player_init)
         self.setMouseTracking(True)
         # self.displayLayer.setMouseTracking(True)
         # self.playerControlLayer.setMouseTracking(True)
         self.srContext = srContext
-        self.playStatus = True
+        # self.playStatus = True
         self.audioDevice = AudioDevice()
         self.isSetFullScreen = False
         self.playThread = None
         self.playWorker = None
+        self.player_init()
+        
 
 
-    def play(self, media_info=None):
+    def player_init(self,):
 
         self.playThread = QThread()
         self.playWorker = PlayWorker(self.displayLayer,self.audioDevice,self.srContext)
@@ -53,9 +59,15 @@ class CiliCiliPlayer(QWidget):
         self.playWorker.update_playback_progress.connect(self.playerControlLayer.updatePlayProgress)
         self.playerControlLayer.seek_to.connect(self.playWorker.seek)
         self.playerControlLayer.switch_sr_mode.connect(self.playWorker.switchSRMode)
-        self.playThread.started.connect(lambda:self.playWorker.play(media_info))
+        # self.playThread.started.connect(lambda:self.playWorker.play(media_info))
         self.playThread.start()
-        self.playStatus = True
+        # self.playStatus = True
+
+    def play(self, media_info:MediaInfo):
+        self.playWorker.shutdown_signal.emit(True)
+        self.playWorker.play_signal.emit(media_info)
+
+
 
     def switchFullScreen(self,state:bool):
         if state:
@@ -77,7 +89,7 @@ class CiliCiliPlayer(QWidget):
 
     def shutdown(self):
         if self.playWorker is not None:
-            self.playWorker.shutdown_signal.emit()
+            self.playWorker.shutdown_signal.emit(False)
         if self.playThread is not None:
             self.playThread.quit()
             self.playThread.wait()

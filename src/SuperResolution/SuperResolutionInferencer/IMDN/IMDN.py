@@ -17,11 +17,12 @@ class IMDN(Inferencer):
         # eventLoop.processEvents()
         self.device = torch.device('cuda:0')
 
-        self.model= IMDN_E(upscale=4)
+        # self.model= IMDN_E(upscale=4)
+        self.model= IMDN_RTC(upscale=2)
         
         # print(os.path.dirname(__file__))
         
-        weight = torch.load(os.path.join(os.path.dirname(__file__),"Model","latest.pth"))
+        weight = torch.load(os.path.join(os.path.dirname(__file__),"Model","RTC_step_45000.pth"))
         # weight = torch.load("C:\\Users\\White\\Project\\rtsr_client_pyqt\\src\\SuperResolution\\SuperResolutionInferencer\\FSRCNN\\Model\\fsrcnn.pth")
         self.model.load_state_dict(weight)
         self.model.eval()

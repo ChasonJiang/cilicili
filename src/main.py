@@ -14,41 +14,6 @@ from SuperResolution.SRContext import SRContext
 from SuperResolution.SuperResolutionHandler import SuperResolutionHandler
 from player.utils.MediaInfo import MediaInfo
 from player.CiliCiliPlayer import CiliCiliPlayer
-# torch.cuda.init()
-# import pycuda.driver
-# pycuda.driver.init()
-# import pycuda.autoinit
-
-# import pycuda.driver as cuda
-# import atexit
-
-# # Initialize CUDA
-# cuda.init()
-
-# from pycuda.tools import make_default_context  # noqa: E402
-
-# global cuda_context
-# cuda_context = make_default_context()
-# device = cuda_context.get_device()
-
-# print(cuda_context)
-# def _finish_up():
-#     global cuda_context
-#     cuda_context.pop()
-#     cuda_context = None
-
-#     from pycuda.tools import clear_context_caches
-
-#     clear_context_caches()
-
-
-# atexit.register(_finish_up)
-
-# import pycuda.driver
-# # import pycuda.gl.autoinit
-# from player.utils.CudaAutoInit import *
-# import pycuda.gl
-
 
 # def RTSR(srh_srContext):
 

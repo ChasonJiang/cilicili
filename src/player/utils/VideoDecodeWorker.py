@@ -17,7 +17,8 @@ from .VideoContext import VideoContext
 import logging
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
 # LOGGER=logging.getLogger("VideoDecodeWorkerLogger")
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class VideoDecodeWorker(QObject):
     buffer_queue_full_signal = pyqtSignal(str)

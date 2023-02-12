@@ -12,7 +12,8 @@ from player.utils.PlayClock import PlayClock
 from ..DisplayLayer import DisplayLayer
 from .DisplayDevice import DisplayDevice
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 
 class VideoPlayWorker(QObject):

@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from PlayerAssets_rc import *
+
 from .SeekSlider import SeekSlider
 
 
@@ -353,3 +353,4 @@ class PlayerControlBar(QtWidgets.QWidget):
         self.playControlRightFrameLayout_2.setStretch(4, 1)
         self.playControlFrameLayout.addWidget(self.playControlRightFrame)
         self.playControlBarLayout_2.addWidget(self.playControlFrame)
+from .PlayerAssets import *

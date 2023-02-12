@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from qasync import asyncSlot
-from ui.VideoCard_UI import Ui_VideoCard
+from ..VideoInfo.VideoInfo import VideoInfo
+from ..ui.VideoCard_UI import Ui_VideoCard
 import aiohttp
 
 
@@ -21,19 +22,35 @@ class VideoCard(QWidget,Ui_VideoCard):
     stat=None
     is_followed=None
     rcmd_reason=None
+    credential = None
 
-    load_info_pyqt = pyqtSignal()
+    load_info_signal = pyqtSignal()
 
-    to_play_pyqt = pyqtSignal(dict)
+    to_play_signal = pyqtSignal(dict)
 
     def __init__(self,parent=None):
         super(VideoCard, self).__init__(parent=parent)
         self.setupUi(self)
-        self.load_info_pyqt.connect(self.loadInfo)
-        self.VideoCover.clicked.connect(self.toPlay)
-        self.VideoTitle.clicked.connect(self.toPlay)
-        self.VideoAuthor.clicked.connect(self.toPlay)
-        self.PlayInfo.clicked.connect(self.toPlay)
+        self.load_info_signal.connect(self.loadInfo)
+        # self.VideoCover.click.connect(self.toPlay)
+        # self.VideoTitle.click.connect(self.toPlay)
+        # self.VideoAuthor.clicked.connect(self.toPlay)
+        # self.PlayInfo.clicked.connect(self.toPlay)
+        self.VideoCover.installEventFilter(self)
+        self.VideoTitle.installEventFilter(self)
+        self.VideoAuthor.installEventFilter(self)
+        self.PlayInfo.installEventFilter(self)
+
+
+    def eventFilter(self, obj: 'QObject', e: 'QEvent') -> bool:
+        event_type = e.type()
+        if obj in [self.VideoCover,self.VideoTitle,self.VideoAuthor,self.PlayInfo]:
+            if event_type == QEvent.Type.MouseButtonRelease:
+                if e.button() == Qt.MouseButton.LeftButton:
+                    self.toPlay()
+                    return True
+
+        return super().eventFilter(obj, e)
 
     @asyncSlot()
     async def toPlay(self):
@@ -42,10 +59,13 @@ class VideoCard(QWidget,Ui_VideoCard):
             "bvid":self.bvid,
             "cid":self.cid,
             "title":self.title,
+            "credential":self.credential
         }
 
-
-        self.to_play_pyqt.emit(d)
+        # videoInfo=VideoInfo(self.bvid,self.aid)
+        # await videoInfo.requestData()
+        # print(videoInfo.info)
+        self.to_play_signal.emit(d)
 
     @asyncSlot()
     async def loadInfo(self):

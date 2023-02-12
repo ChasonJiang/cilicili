@@ -346,3 +346,4 @@ class Ui_playerControlLayer(object):
         self.playProgressInfo.setPlaceholderText(_translate("playerControlLayer", "00:00 / 00:00"))
         self.superResolutionButton.setText(_translate("playerControlLayer", "超分辨率"))
         self.resolutionButton.setText(_translate("playerControlLayer", "清晰度"))
+from .PlayerAssets import *

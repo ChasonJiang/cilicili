@@ -30,3 +30,4 @@ class Ui_CiliCiliPlayer(object):
     def retranslateUi(self, CiliCiliPlayer):
         _translate = QtCore.QCoreApplication.translate
         CiliCiliPlayer.setWindowTitle(_translate("CiliCiliPlayer", "Form"))
+from .PlayerAssets import *

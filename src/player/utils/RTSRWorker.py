@@ -6,7 +6,8 @@ from SuperResolution.HandlerCmd import HandlerCmd
 
 from SuperResolution.SRContext import SRContext
 from SuperResolution.SRStatusCode import SRStatusCode as SRSC
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class RTSRWorker(QObject):
     def __init__(self, srContext,vbufferQueue,srbufferQueue):

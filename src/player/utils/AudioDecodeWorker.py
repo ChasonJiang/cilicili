@@ -12,7 +12,8 @@ import numpy as np
 from .AudioContext import AudioContext
 import logging
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class AudioDecodeWorker(QObject):
     buffer_queue_full_signal = pyqtSignal(str)
@@ -34,7 +35,8 @@ class AudioDecodeWorker(QObject):
         self.ss = ss # ms, int
         self.base_pts = base_pts
         self.frame_rate = self.audio_context.frame_rate
-        self.frame_size = round(2*48000*16*(1.0/self.frame_rate)/8)
+        self.sample_rate = 192000
+        self.frame_size = round(2*self.sample_rate*16*(1.0/self.frame_rate)/8)
         self.name = "AudioDecodeWorker"
         self.process = None
 
@@ -60,6 +62,7 @@ class AudioDecodeWorker(QObject):
     def write_buffer(self, audio_context:AudioContext):
         curr_frame_pts = 0
         curr_frame_index = 0
+        zero_byte_counter = 0
         try:
             while True:
                 if  self._isQuit:
@@ -72,10 +75,16 @@ class AudioDecodeWorker(QObject):
                 # 计算音频每帧的字节数 channel * sample_rate * seconds_per_frame / 8 
 
                 frame_bytes=self.decoder.stdout.read(self.frame_size)
-                if not frame_bytes:
-                    self.decode_end_signal.emit()
-                    LOGGER.debug("audio frame over")
-                    break
+                if len(frame_bytes)==0:
+                    if zero_byte_counter>5:
+                        self.decode_end_signal.emit()
+                        LOGGER.debug("audio frame over")
+                        break
+                    zero_byte_counter+=1
+                    sleep(2)
+                    continue
+        
+                zero_byte_counter = 0
 
                 frame = (
                     np
@@ -116,7 +125,7 @@ class AudioDecodeWorker(QObject):
                                     map="0:a",
                                     format='s16le', 
                                     ac="2", 
-                                    ar="48000",
+                                    ar=str(self.sample_rate),
                                     # af="asyncts=compensate=1"
                                     )
                             .run_async(pipe_stdout=True,pipe_stderr=True)
@@ -143,9 +152,15 @@ class AudioDecodeWorker(QObject):
                                 loglevel="error",
                                 thread_queue_size=self.thread_queue_size
                                 )
-                        .output("-" , format='s16le', ac="2", ar="48000")
-                        .run_async(pipe_stdout=True,pipe_stderr=True)
-                    )
+                            .output("-" , 
+                                    map="0:a",
+                                    format='s16le', 
+                                    ac="2", 
+                                    ar=str(self.sample_rate),
+                                    # af="asyncts=compensate=1"
+                                    )
+                            .run_async(cmd=["ffmpeg","-rw_timeout","5000000"],pipe_stdout=True,pipe_stderr=True)
+                        )
                 elif "user-agent"  in audio_context.req_header.keys():
                     decoder=(
                         ffmpeg
@@ -158,8 +173,14 @@ class AudioDecodeWorker(QObject):
                                 loglevel="error",
                                 thread_queue_size=self.thread_queue_size
                                 )
-                        .output("-" , format='s16le', ac="2", ar="48000")
-                        .run_async(pipe_stdout=True,pipe_stderr=True)
+                            .output("-" , 
+                                    map="0:a",
+                                    format='s16le', 
+                                    ac="2", 
+                                    ar=str(self.sample_rate),
+                                    # af="asyncts=compensate=1"
+                                    )
+                            .run_async(pipe_stdout=True,pipe_stderr=True)
                     )
                 elif "referer" in audio_context.req_header.keys():
                     decoder=(
@@ -173,7 +194,13 @@ class AudioDecodeWorker(QObject):
                                 loglevel="error",
                                 thread_queue_size=self.thread_queue_size
                                     )
-                            .output("-" , format='s16le', ac="2", ar="48000")
+                            .output("-" , 
+                                    map="0:a",
+                                    format='s16le', 
+                                    ac="2", 
+                                    ar=str(self.sample_rate),
+                                    # af="asyncts=compensate=1"
+                                    )
                             .run_async(pipe_stdout=True,pipe_stderr=True)
                         )
                 else:
@@ -187,7 +214,13 @@ class AudioDecodeWorker(QObject):
                                 loglevel="error",
                                 thread_queue_size=self.thread_queue_size
                                     )
-                            .output("-" , format='s16le', ac="2", ar="48000") 
+                            .output("-" , 
+                                    map="0:a",
+                                    format='s16le', 
+                                    ac="2", 
+                                    ar=str(self.sample_rate),
+                                    # af="asyncts=compensate=1"
+                                    )
                             .run_async(pipe_stdout=True,pipe_stderr=True)
                         )
         except:

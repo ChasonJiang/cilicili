@@ -24,8 +24,8 @@ from .AudioDecodeWorker import AudioDecodeWorker
 from .AudioPlayWorker import AudioPlayWorker
 from .VideoPlayWorker  import VideoPlayWorker
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
-LOGGER=logging.getLogger()
-
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 class PlayWorker(QObject):
     play_signal = pyqtSignal(MediaInfo)
     play_pause_signal = pyqtSignal()
@@ -166,7 +166,7 @@ class PlayWorker(QObject):
                                             req_params=mediaInfo.req_params,
                                             req_data=mediaInfo.req_data
                                             )
-                # videoContext.frame_rate=20.0
+                # videoContext.frame_rate=24
                 self.videoContextList.append(videoContext)
             except:
                 self.exceptionStatus = True

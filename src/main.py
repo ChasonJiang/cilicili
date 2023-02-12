@@ -1,6 +1,9 @@
 
 # from multiprocessing import Process
 # from multiprocessing import Pipe
+import asyncio
+import functools
+import qasync
 from torch.multiprocessing import Process
 from torch.multiprocessing import Pipe
 import sys
@@ -10,10 +13,13 @@ from time import sleep
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from CiliCili.MainWindow import MainWindow
 from SuperResolution.SRContext import SRContext
 from SuperResolution.SuperResolutionHandler import SuperResolutionHandler
+from player.PlayerWindow import PlayerWindow
 from player.utils.MediaInfo import MediaInfo
 from player.CiliCiliPlayer import CiliCiliPlayer
+logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.ERROR) # DEBUG
 
 # def RTSR(srh_srContext):
 
@@ -37,7 +43,7 @@ def Application(args:list):
     srContext = args
     app = QApplication(sys.argv)
     # player = BasePlayer()
-    player = CiliCiliPlayer(srContext=srContext)
+    player = PlayerWindow(srContext=srContext)
     player.show()
     player.play(media_info)
     # player.play(media_info)
@@ -46,6 +52,88 @@ def Application(args:list):
     # window = Window()
     # window.show()
     sys.exit(app.exec_())
+
+
+def runMainWindow():
+    async def run():
+        def close_future(future, loop):
+            loop.call_later(10, future.cancel)
+            future.cancel()
+
+        loop = asyncio.get_event_loop()
+        future = asyncio.Future()
+
+        app = QApplication.instance()
+        if hasattr(app, "aboutToQuit"):
+            getattr(app, "aboutToQuit").connect(
+                functools.partial(close_future, future, loop)
+            )
+
+        mainWindow = MainWindow()
+        mainWindow.show()
+
+        await future
+        return True
+
+    try:
+    # qasync.run(master())
+    # m()
+        qasync.run(run())
+    except asyncio.exceptions.CancelledError:
+        sys.exit(0)
+
+
+def runPlayerWindow(srContext:SRContext):
+    # async def run():
+    #     logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.DEBUG, force=True) # DEBUG
+    #     # media_info = MediaInfo([vurl],[vurl],"network")
+    #     # media_info=MediaInfo(["assets\\5s.mkv", "assets\\5s.mkv"],["assets\\5s.mkv", "assets\\5s.mkv"],"file")
+    #     # media_info = MediaInfo([r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],[r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],"file")
+    #     media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
+    #     # srContext = args
+    #     app = QApplication(sys.argv)
+    #     # player = BasePlayer()
+    #     player = PlayerWindow(srContext=srContext)
+    #     player.show()
+    #     player.play(media_info)
+    #     # player.play(media_info)
+    #     # sleep(10)
+    #     # print("asdfgasdfgsdf")
+    #     # window = Window()
+    #     # window.show()
+    #     sys.exit(app.exec_())
+
+    async def run(srContext):
+        
+        media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
+
+        def close_future(future, loop):
+            loop.call_later(10, future.cancel)
+            future.cancel()
+
+        loop = asyncio.get_event_loop()
+        future = asyncio.Future()
+        # logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.DEBUG, force=True) # DEBUG
+        
+        app = QApplication.instance()
+        if hasattr(app, "aboutToQuit"):
+            getattr(app, "aboutToQuit").connect(
+                functools.partial(close_future, future, loop)
+            )
+            
+        player = PlayerWindow(srContext=srContext)
+        player.show()
+        # player.play(media_info)
+
+        await future
+        return True
+
+    try:
+    # qasync.run(master())
+    # m()
+        qasync.run(run(srContext))
+    except asyncio.exceptions.CancelledError:
+        sys.exit(0)
 
 
 def start():
@@ -57,14 +145,19 @@ def start():
     app_srContext = SRContext(outCmdPipe,inMsgPipe,app_inDataPipe, app_outDataPipe)
     srh_srContext = SRContext(inCmdPipe, outMsgPipe,srh_inDataPipe ,srh_outDataPipe)
 
-    app=Process(target=Application,args=[app_srContext])
+    # app=Process(target=Application,args=[app_srContext])
+    playerWindow=Process(target=runPlayerWindow,args=[app_srContext])
+    mainWindow = Process(target=runMainWindow)
     # rtsr = Process(target=RTSR,)
     rtsr = SuperResolutionHandler(srh_srContext)
     # rtsr=Process(target=RTSR,args=[srh_srContext])
-    app.start()
+    playerWindow.start()
+    mainWindow.start()
     rtsr.start()
     rtsr.join()
-    app.join()
+    mainWindow.join()
+    playerWindow.join()
+
 
 
 

@@ -5,7 +5,8 @@ import ffmpeg
 
 from .HHMMSS2ms import HHMMSS2ms
 
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class VideoContext():
     def __init__(self, url, source, req_method=None, req_header=None, req_params=None, req_data=None):

@@ -5,7 +5,7 @@ class AudioDevice(QObject):
     def __init__(self,):
         super(AudioDevice, self).__init__()
         self.audioDevice = PyAudio()
-        self.stream = self.audioDevice.open(format=self.audioDevice.get_format_from_width(2), channels=2, rate=48000, output=True)
+        self.stream = self.audioDevice.open(format=self.audioDevice.get_format_from_width(2), channels=2, rate=192000, output=True)
         
 
 

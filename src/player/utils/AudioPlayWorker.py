@@ -10,7 +10,8 @@ from player.utils.PlayClock import PlayClock
 
 from .AudioDevice import AudioDevice
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class AudioPlayWorker(QObject):
     wait_buffer_signal = pyqtSignal(bool)

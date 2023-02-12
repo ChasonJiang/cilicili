@@ -16,27 +16,31 @@ from .utils.AudioDevice import AudioDevice
 from .utils.DisplayDevice import DisplayDevice
 from .DisplayLayer import DisplayLayer
 from .utils.PlayWorker import PlayWorker
-# from .assets.player_assets import *
+from .ui.PlayerAssets import *
 # import pycuda.driver
 # import pycuda.autoinit
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
-LOGGER=logging.getLogger()
-
+# logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 class CiliCiliPlayer(QWidget):
     decoder_work_signal  = pyqtSignal()
-    video_play_signal = pyqtSignal()
-    play_pause_signal = pyqtSignal()
-    play_resume_signal = pyqtSignal()
+    play_signal = pyqtSignal(MediaInfo)
+    pause_signal = pyqtSignal()
+    resume_signal = pyqtSignal()
+    # switch_full_screen_signal = pyqtSignal(bool)
     player_init_signal = pyqtSignal()
 
     def __init__(self, parent=None,srContext:SRContext=None):
         super(CiliCiliPlayer, self).__init__(parent=parent)
-        LOGGER.info("init BasePlayer")
+        LOGGER.info("init CiliCiliPlayer")
         self.setupUi()
+        self._parent = parent
         self.playerControlLayer.switch_play_state.connect(self.switchPlayState)
         self.playerControlLayer.show_full_screen.connect(self.switchFullScreen)
+        self.play_signal.connect(self.play)
         self.player_init_signal.connect(self.player_init)
+        # self.switch_full_screen_signal.connect(self.switchFullScreen)
         self.setMouseTracking(True)
         # self.displayLayer.setMouseTracking(True)
         # self.playerControlLayer.setMouseTracking(True)
@@ -70,12 +74,13 @@ class CiliCiliPlayer(QWidget):
 
 
     def switchFullScreen(self,state:bool):
-        if state:
-            self.isSetFullScreen = True
-            self.showFullScreen()
-        else:
-            self.isSetFullScreen = False
-            self.showNormal()
+        self._parent.switch_full_screen_signal.emit(state)
+        # if state:
+        #     self.isSetFullScreen = True
+        #     self.showFullScreen()
+        # else:
+        #     self.isSetFullScreen = False
+        #     self.showNormal()
 
     # def mouseMoveEvent(self, event):
     #     # print("mouseMoveEvent")
@@ -114,11 +119,15 @@ class CiliCiliPlayer(QWidget):
 
 
     def resizeEvent(self, event: QResizeEvent):
-        if not self.isSetFullScreen:
+        # if not self.isSetFullScreen:
+        if True:
             if self.parent() is None:
                 self.playerControlLayer.size_follow_parent.emit(QRect(0,0, event.size().width(),event.size().height()))
             else:
-                self.playerControlLayer.size_follow_parent.emit(QRect(self.geometry().x(),self.geometry().y(), event.size().width(),event.size().height()))
+                self.playerControlLayer.size_follow_parent.emit(QRect(self.geometry().x(),
+                                                                        self.geometry().y(), 
+                                                                        event.size().width(),
+                                                                        event.size().height()))
         return super().resizeEvent(event)
         
 

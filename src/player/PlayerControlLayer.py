@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import *
 
 from player.ui.Ui_PlayerControlLayer import Ui_playerControlLayer
 
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     size_follow_parent = pyqtSignal(QRect)

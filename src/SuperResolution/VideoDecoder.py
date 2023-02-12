@@ -68,6 +68,8 @@ class VideoDecoder(Thread):
             * video_context.frame_height \
             * video_context.frame_channels
         self.sr_context.msgPipe.send(SRSC.Started)
+
+        zero_byte_counter = 0
         try:
             while True:
                 if self._isQuit:
@@ -78,11 +80,19 @@ class VideoDecoder(Thread):
 
                 # print("read video frame")
                 frame_bytes=self.decoder.stdout.read(frame_size)
-                if not frame_bytes:
-                    self.send(None)
-                    LOGGER.info("video frame over")
-                    break
-
+                if len(frame_bytes)==0:
+                    
+                    if zero_byte_counter>5:
+                        self.send(None)
+                        print("video decode over")
+                        LOGGER.info("video frame over")
+                        break
+                    zero_byte_counter+=1
+                    sleep(2)
+                    continue
+        
+                zero_byte_counter = 0
+                
                 frame = (
                     np
                     .frombuffer(frame_bytes, np.uint8)
@@ -93,9 +103,9 @@ class VideoDecoder(Thread):
 
                 self.send(frame)
 
-        except:
+        except Exception as e:
             self.sr_context.msgPipe.send(SRSC.ProcessException)
-            print("video frame buffer exception")
+            print("video frame buffer exception:\n",e)
             RuntimeError("video frame buffer exception")
         finally:
             self.decoder.stdout.close()
@@ -110,6 +120,7 @@ class VideoDecoder(Thread):
                             ffmpeg
                             .input(
                                     video_context.url,
+                                    rw_timeout=1.5*1000000,
                                     ss=(video_context.start_time+ss)/1000.0,
                                     loglevel="error",
                                     thread_queue_size=self.thread_queue_size,
@@ -145,12 +156,15 @@ class VideoDecoder(Thread):
                                 ss=(video_context.start_time+ss)/1000.0,
                                 loglevel="error",
                                 )
-                        .output("-" , 
-                                format='rawvideo', 
-                                pix_fmt='rgb24',
-                                thread_queue_size=self.thread_queue_size,
-                                )
-                        .run_async(pipe_stdout=True,pipe_stderr=True)
+                            .output("-" , 
+                                    map="0:v",
+                                    vsync="cfr",
+                                    r=video_context.frame_rate,
+                                    shortest =None,
+                                    format='rawvideo', 
+                                    pix_fmt='rgb24'
+                                    )
+                            .run_async(cmd=["ffmpeg","-rw_timeout","5000000"],pipe_stdout=True,pipe_stderr=True)
                     )
                 elif "user-agent"  in video_context.req_header.keys():
                        decoder=(
@@ -163,12 +177,15 @@ class VideoDecoder(Thread):
                                 ss=(video_context.start_time+ss)/1000.0,
                                 loglevel="error",
                                 )
-                        .output("-" , 
-                                format='rawvideo', 
-                                pix_fmt='rgb24',
-                                thread_queue_size=self.thread_queue_size,
-                                )
-                        .run_async(pipe_stdout=True,pipe_stderr=True)
+                            .output("-" , 
+                                    map="0:v",
+                                    vsync="cfr",
+                                    r=video_context.frame_rate,
+                                    shortest =None,
+                                    format='rawvideo', 
+                                    pix_fmt='rgb24'
+                                    )
+                            .run_async(pipe_stdout=True,pipe_stderr=True)
                     )
                 elif "referer" in video_context.req_header.keys():
                     decoder=(
@@ -181,12 +198,15 @@ class VideoDecoder(Thread):
                                 ss=(video_context.start_time+ss)/1000.0,
                                 loglevel="error",
                                 )
-                        .output("-" , 
-                                format='rawvideo', 
-                                pix_fmt='rgb24',
-                                thread_queue_size=self.thread_queue_size,
-                                )
-                        .run_async(pipe_stdout=True,pipe_stderr=True)
+                            .output("-" , 
+                                    map="0:v",
+                                    vsync="cfr",
+                                    r=video_context.frame_rate,
+                                    shortest =None,
+                                    format='rawvideo', 
+                                    pix_fmt='rgb24'
+                                    )
+                            .run_async(pipe_stdout=True,pipe_stderr=True)
                     )
                 else:
                     decoder=(
@@ -200,12 +220,15 @@ class VideoDecoder(Thread):
                                 ss=(video_context.start_time+ss)/1000.0,
                                 loglevel="error",
                                 )
-                        .output("-" , 
-                                format='rawvideo', 
-                                pix_fmt='rgb24',
-                                thread_queue_size=self.thread_queue_size,
-                                )
-                        .run_async(pipe_stdout=True,pipe_stderr=True)
+                            .output("-" , 
+                                    map="0:v",
+                                    vsync="cfr",
+                                    r=video_context.frame_rate,
+                                    shortest =None,
+                                    format='rawvideo', 
+                                    pix_fmt='rgb24'
+                                    )
+                            .run_async(pipe_stdout=True,pipe_stderr=True)
                     )
         except:
             LOGGER.error("video decoder 获取失败！")

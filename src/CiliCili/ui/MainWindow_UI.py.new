@@ -14,14 +14,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1800, 1200)
+        MainWindow.resize(1605, 1226)
         MainWindow.setStyleSheet("#MainWindow {\n"
 "background: rgba(255,255,255,0);\n"
 "margin:0;\n"
 "padding:0;\n"
 "}")
         self.horizontalLayout = QtWidgets.QHBoxLayout(MainWindow)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setContentsMargins(5, 5, 5, 5)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.ContainerWindow = QtWidgets.QWidget(MainWindow)
@@ -337,7 +337,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaContents = QtWidgets.QWidget()
-        self.scrollAreaContents.setGeometry(QtCore.QRect(0, 0, 1735, 1130))
+        self.scrollAreaContents.setGeometry(QtCore.QRect(0, 0, 1530, 1146))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

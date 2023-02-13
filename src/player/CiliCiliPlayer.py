@@ -51,6 +51,7 @@ class CiliCiliPlayer(QWidget):
         self.playThread = None
         self.playWorker = None
         self.player_init()
+        self.play_locker = QMutex()
         
 
 
@@ -59,6 +60,7 @@ class CiliCiliPlayer(QWidget):
         self.playThread = QThread()
         self.playWorker = PlayWorker(self.displayLayer,self.audioDevice,self.srContext)
         self.playWorker.moveToThread(self.playThread)
+        self.pause_signal.connect(self.playWorker.play_pause_signal.emit)
         self.playWorker.send_duration_time.connect(self.playerControlLayer.setDurationTime)
         self.playWorker.update_playback_progress.connect(self.playerControlLayer.updatePlayProgress)
         self.playerControlLayer.seek_to.connect(self.playWorker.seek)
@@ -68,8 +70,11 @@ class CiliCiliPlayer(QWidget):
         # self.playStatus = True
 
     def play(self, media_info:MediaInfo):
-        self.playWorker.shutdown_signal.emit(True)
+        self.play_locker.lock()
+        # self.playWorker.play_pause_signal.emit()
+        # self.playWorker.shutdown_signal.emit(True)
         self.playWorker.play_signal.emit(media_info)
+        self.play_locker.unlock()
 
 
 

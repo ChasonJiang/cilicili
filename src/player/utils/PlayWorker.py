@@ -54,7 +54,9 @@ class PlayWorker(QObject):
         self.srContext = srContext
         self.inited = False
         self.play_signal.connect(self.play)
-
+        self.play_locker = QMutex()
+        self.play_pause_signal.connect(self.pause)
+        self.play_resume_signal.connect(self.resume)
 
 
     def init(self,mediaInfo:MediaInfo):
@@ -74,8 +76,6 @@ class PlayWorker(QObject):
         self.audioContextList = None
         self.updatePlaybackProgressTimerThread = None
         self.updatePlaybackProgressTimer = None
-        self.play_pause_signal.connect(self.pause)
-        self.play_resume_signal.connect(self.resume)
         self.curr_slice_index = 0
         self.curr_slice_frame_rate = None
         self.max_slice = 0
@@ -112,6 +112,12 @@ class PlayWorker(QObject):
 
     def play(self, mediaInfo:MediaInfo):
         # print("play is {}".format(QThread.currentThreadId()))  
+        self.play_locker.lock()
+        # if not self.inited:
+            # self.pause()
+        # self.resume()
+        self.shutdown(True)
+            # self.cleanUp()
         if not self.isFirstLoad:
             self.cleanUp()
         else:
@@ -127,7 +133,8 @@ class PlayWorker(QObject):
         except Exception as e:
             LOGGER.error(e.with_traceback())
             self.shutdown()
-
+        finally:
+            self.play_locker.unlock()
 
             
 
@@ -497,13 +504,13 @@ class PlayWorker(QObject):
 
 
     def quit_avplay_thread(self):
-        if self.videoDecodeThread is not None:
+        if self.videoPlayThread is not None:
             LOGGER.debug("quit video play thread")
             self.videoPlayThread.quit()
             self.videoPlayThread.wait()
             self.videoPlayThread = None
 
-        if self.audioDecodeThread is not None:
+        if self.audioPlayThread is not None:
             LOGGER.debug("quit audio play thread")
             self.audioPlayThread.quit()
             self.audioPlayThread.wait()

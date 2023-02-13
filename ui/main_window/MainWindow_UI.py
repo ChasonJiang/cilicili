@@ -14,46 +14,67 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setWindowModality(QtCore.Qt.NonModal)
-        MainWindow.resize(1080, 658)
-        MainWindow.setMinimumSize(QtCore.QSize(1080, 658))
+        MainWindow.resize(1800, 1200)
         MainWindow.setStyleSheet("#MainWindow {\n"
-"background: rgba(255,255,255,255);\n"
-"border-radius: 5px;\n"
+"background: rgba(255,255,255,0);\n"
+"margin:0;\n"
+"padding:0;\n"
 "}")
         self.horizontalLayout = QtWidgets.QHBoxLayout(MainWindow)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setContentsMargins(5, 5, 5, 5)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.LeftBar = QtWidgets.QWidget(MainWindow)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.ContainerWindow = QtWidgets.QWidget(MainWindow)
+        self.ContainerWindow.setStyleSheet("#ContainerWindow {\n"
+"background: rgba(255,255,255,255);\n"
+"margin:0;\n"
+"padding:0;\n"
+"border-color: rgba(255,255,255,100);\n"
+"border-radius: 10px 10px 10px 10px;\n"
+"}")
+        self.ContainerWindow.setObjectName("ContainerWindow")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.ContainerWindow)
+        self.horizontalLayout_5.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
+        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_5.setSpacing(0)
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.LeftBar = QtWidgets.QWidget(self.ContainerWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.LeftBar.sizePolicy().hasHeightForWidth())
         self.LeftBar.setSizePolicy(sizePolicy)
         self.LeftBar.setMinimumSize(QtCore.QSize(65, 0))
         self.LeftBar.setMaximumSize(QtCore.QSize(65, 16777215))
+        self.LeftBar.setSizeIncrement(QtCore.QSize(0, 0))
         self.LeftBar.setBaseSize(QtCore.QSize(0, 0))
-        self.LeftBar.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.LeftBar.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.LeftBar.setStyleSheet("#LeftBar {\n"
 "background-color: rgb(245, 245, 247);\n"
 "padding:0;\n"
-"margin:0;\n"
+"margin:0px;\n"
+"border-top-left-radius: 10px;\n"
+"border-bottom-left-radius: 10px;\n"
 "}")
         self.LeftBar.setObjectName("LeftBar")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.LeftBar)
+        self.verticalLayout_2.setContentsMargins(15, 15, 15, 15)
+        self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(32, 1093, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
         self.widget = QtWidgets.QWidget(self.LeftBar)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
         self.widget.setSizePolicy(sizePolicy)
         self.widget.setMinimumSize(QtCore.QSize(0, 100))
+        self.widget.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.widget.setObjectName("widget")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.widget)
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.Avatar = QtWidgets.QLabel(self.widget)
         self.Avatar.setText("")
@@ -91,8 +112,8 @@ class Ui_MainWindow(object):
         self.SettingButton.setObjectName("SettingButton")
         self.verticalLayout_3.addWidget(self.SettingButton)
         self.verticalLayout_2.addWidget(self.widget)
-        self.horizontalLayout.addWidget(self.LeftBar)
-        self.MainContainer = QtWidgets.QWidget(MainWindow)
+        self.horizontalLayout_5.addWidget(self.LeftBar)
+        self.MainContainer = QtWidgets.QWidget(self.ContainerWindow)
         self.MainContainer.setStyleSheet("#MainContainer {\n"
 "margin:0;\n"
 "padding:0;\n"
@@ -119,6 +140,8 @@ class Ui_MainWindow(object):
 "}")
         self.TopBar.setObjectName("TopBar")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.TopBar)
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem1)
@@ -128,7 +151,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.SearchBox.sizePolicy().hasHeightForWidth())
         self.SearchBox.setSizePolicy(sizePolicy)
-        self.SearchBox.setMinimumSize(QtCore.QSize(300, 35))
+        self.SearchBox.setMinimumSize(QtCore.QSize(400, 40))
         self.SearchBox.setMaximumSize(QtCore.QSize(300, 35))
         self.SearchBox.setStyleSheet("#SearchBox{\n"
 "background-color: rgb(240, 240, 240);\n"
@@ -150,7 +173,8 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.RefreshButton.sizePolicy().hasHeightForWidth())
         self.RefreshButton.setSizePolicy(sizePolicy)
-        self.RefreshButton.setMinimumSize(QtCore.QSize(28, 28))
+        self.RefreshButton.setMinimumSize(QtCore.QSize(35, 35))
+        self.RefreshButton.setMaximumSize(QtCore.QSize(35, 35))
         self.RefreshButton.setStyleSheet("#RefreshButton {\n"
 "image: url(:/main_window/main_window_icon/refresh.svg);\n"
 "background-color: rgba(0, 0, 0, 0);\n"
@@ -185,14 +209,83 @@ class Ui_MainWindow(object):
         self.WindowOP.setMinimumSize(QtCore.QSize(150, 0))
         self.WindowOP.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.WindowOP.setObjectName("WindowOP")
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.WindowOP)
+        self.horizontalLayout_4.setContentsMargins(20, 0, 20, 0)
+        self.horizontalLayout_4.setSpacing(10)
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.MinButton = QtWidgets.QPushButton(self.WindowOP)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.MinButton.sizePolicy().hasHeightForWidth())
+        self.MinButton.setSizePolicy(sizePolicy)
+        self.MinButton.setMinimumSize(QtCore.QSize(35, 35))
+        self.MinButton.setMaximumSize(QtCore.QSize(35, 35))
+        self.MinButton.setStyleSheet("#MinButton {\n"
+"image: url(:/window_op/window_op_icon/min.svg);\n"
+"background-color: rgba(0, 0, 0, 0);\n"
+"padding: 5px,5px;\n"
+"border:0;\n"
+"margin:0;\n"
+"border-radius: 3px;\n"
+"}\n"
+"\n"
+"#MinButton:hover{\n"
+"image: url(:/window_op/window_op_icon/min.svg);\n"
+"background-color: rgb(230, 230, 230);\n"
+"padding: 5px,5px;\n"
+"border:0;\n"
+"margin:0;\n"
+"border-radius: 3px;\n"
+"}")
+        self.MinButton.setText("")
+        self.MinButton.setIconSize(QtCore.QSize(25, 25))
+        self.MinButton.setAutoDefault(False)
+        self.MinButton.setDefault(False)
+        self.MinButton.setFlat(True)
+        self.MinButton.setObjectName("MinButton")
+        self.horizontalLayout_4.addWidget(self.MinButton)
+        self.MaxButton = QtWidgets.QPushButton(self.WindowOP)
+        self.MaxButton.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.MaxButton.sizePolicy().hasHeightForWidth())
+        self.MaxButton.setSizePolicy(sizePolicy)
+        self.MaxButton.setMinimumSize(QtCore.QSize(35, 35))
+        self.MaxButton.setMaximumSize(QtCore.QSize(35, 35))
+        self.MaxButton.setStyleSheet("#MaxButton {\n"
+"image: url(:/window_op/window_op_icon/max.svg);\n"
+"background-color: rgba(0, 0, 0, 0);\n"
+"padding: 5px,5px;\n"
+"border:0;\n"
+"margin:0;\n"
+"border-radius: 3px;\n"
+"}\n"
+"\n"
+"#MaxButton:hover{\n"
+"image: url(:/window_op/window_op_icon/max.svg);\n"
+"background-color: rgb(230, 230, 230);\n"
+"padding: 5px,5px;\n"
+"border:0;\n"
+"margin:0;\n"
+"border-radius: 3px;\n"
+"}")
+        self.MaxButton.setText("")
+        self.MaxButton.setIconSize(QtCore.QSize(25, 25))
+        self.MaxButton.setAutoDefault(False)
+        self.MaxButton.setDefault(False)
+        self.MaxButton.setFlat(True)
+        self.MaxButton.setObjectName("MaxButton")
+        self.horizontalLayout_4.addWidget(self.MaxButton)
         self.CloseButton = QtWidgets.QPushButton(self.WindowOP)
-        self.CloseButton.setGeometry(QtCore.QRect(104, 12, 28, 28))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.CloseButton.sizePolicy().hasHeightForWidth())
         self.CloseButton.setSizePolicy(sizePolicy)
-        self.CloseButton.setMinimumSize(QtCore.QSize(28, 28))
+        self.CloseButton.setMinimumSize(QtCore.QSize(35, 35))
+        self.CloseButton.setMaximumSize(QtCore.QSize(35, 35))
         self.CloseButton.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.CloseButton.setStyleSheet("#CloseButton {\n"
 "image: url(:/window_op/window_op_icon/close.svg);\n"
@@ -218,69 +311,7 @@ class Ui_MainWindow(object):
         self.CloseButton.setDefault(False)
         self.CloseButton.setFlat(False)
         self.CloseButton.setObjectName("CloseButton")
-        self.MaxButton = QtWidgets.QPushButton(self.WindowOP)
-        self.MaxButton.setEnabled(True)
-        self.MaxButton.setGeometry(QtCore.QRect(61, 12, 28, 28))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.MaxButton.sizePolicy().hasHeightForWidth())
-        self.MaxButton.setSizePolicy(sizePolicy)
-        self.MaxButton.setMinimumSize(QtCore.QSize(28, 28))
-        self.MaxButton.setStyleSheet("#MaxButton {\n"
-"image: url(:/window_op/window_op_icon/max.svg);\n"
-"background-color: rgba(0, 0, 0, 0);\n"
-"padding: 5px,5px;\n"
-"border:0;\n"
-"margin:0;\n"
-"border-radius: 3px;\n"
-"}\n"
-"\n"
-"#MaxButton:hover{\n"
-"image: url(:/window_op/window_op_icon/max.svg);\n"
-"background-color: rgb(230, 230, 230);\n"
-"padding: 5px,5px;\n"
-"border:0;\n"
-"margin:0;\n"
-"border-radius: 3px;\n"
-"}")
-        self.MaxButton.setText("")
-        self.MaxButton.setIconSize(QtCore.QSize(25, 25))
-        self.MaxButton.setAutoDefault(False)
-        self.MaxButton.setDefault(False)
-        self.MaxButton.setFlat(True)
-        self.MaxButton.setObjectName("MaxButton")
-        self.MinButton = QtWidgets.QPushButton(self.WindowOP)
-        self.MinButton.setGeometry(QtCore.QRect(18, 12, 28, 28))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.MinButton.sizePolicy().hasHeightForWidth())
-        self.MinButton.setSizePolicy(sizePolicy)
-        self.MinButton.setMinimumSize(QtCore.QSize(28, 28))
-        self.MinButton.setStyleSheet("#MinButton {\n"
-"image: url(:/window_op/window_op_icon/min.svg);\n"
-"background-color: rgba(0, 0, 0, 0);\n"
-"padding: 5px,5px;\n"
-"border:0;\n"
-"margin:0;\n"
-"border-radius: 3px;\n"
-"}\n"
-"\n"
-"#MinButton:hover{\n"
-"image: url(:/window_op/window_op_icon/min.svg);\n"
-"background-color: rgb(230, 230, 230);\n"
-"padding: 5px,5px;\n"
-"border:0;\n"
-"margin:0;\n"
-"border-radius: 3px;\n"
-"}")
-        self.MinButton.setText("")
-        self.MinButton.setIconSize(QtCore.QSize(25, 25))
-        self.MinButton.setAutoDefault(False)
-        self.MinButton.setDefault(False)
-        self.MinButton.setFlat(True)
-        self.MinButton.setObjectName("MinButton")
+        self.horizontalLayout_4.addWidget(self.CloseButton)
         self.horizontalLayout_2.addWidget(self.WindowOP)
         self.verticalLayout.addWidget(self.TopBar)
         self.Container = QtWidgets.QWidget(self.MainContainer)
@@ -306,7 +337,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaContents = QtWidgets.QWidget()
-        self.scrollAreaContents.setGeometry(QtCore.QRect(0, 0, 1015, 588))
+        self.scrollAreaContents.setGeometry(QtCore.QRect(0, 0, 1725, 1120))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -319,15 +350,14 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidget(self.scrollAreaContents)
         self.horizontalLayout_3.addWidget(self.scrollArea)
         self.verticalLayout.addWidget(self.Container)
-        self.horizontalLayout.addWidget(self.MainContainer)
+        self.horizontalLayout_5.addWidget(self.MainContainer)
+        self.horizontalLayout.addWidget(self.ContainerWindow)
 
         self.retranslateUi(MainWindow)
-        self.CloseButton.released.connect(MainWindow.close)
-        self.MinButton.released.connect(MainWindow.showMinimized)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Form"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "CiliCili"))
         self.SearchBox.setPlaceholderText(_translate("MainWindow", "搜索你感兴趣的视频"))
-from .assets import *
+import assets_rc

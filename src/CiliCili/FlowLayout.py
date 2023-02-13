@@ -63,7 +63,7 @@ class FlowLayout(QLayout):
             return None
 
     def clear(self):
-        for item in self.items:
+        for item in self.items.copy():
             self.removeWidget(item.widget())
 
     def expandingDirections(self,):

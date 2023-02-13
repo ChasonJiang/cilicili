@@ -76,13 +76,16 @@ class AudioDecodeWorker(QObject):
 
                 frame_bytes=self.decoder.stdout.read(self.frame_size)
                 if len(frame_bytes)==0:
-                    if zero_byte_counter>5:
-                        self.decode_end_signal.emit()
-                        LOGGER.debug("audio frame over")
-                        break
-                    zero_byte_counter+=1
-                    sleep(2)
-                    continue
+                    self.decode_end_signal.emit()
+                    LOGGER.debug("audio frame over")
+                    break
+                    # if zero_byte_counter>5:
+                    #     self.decode_end_signal.emit()
+                    #     LOGGER.debug("audio frame over")
+                    #     break
+                    # zero_byte_counter+=1
+                    # sleep(2)
+                    # continue
         
                 zero_byte_counter = 0
 

@@ -79,9 +79,13 @@ class VideoPlayWorker(QObject):
 
     def quit(self):
         self._isQuit = True
+        if self._isPause:
+            self.resume()
 
     def forcedQuit(self):
         self.forced_quit = True
+        if self._isPause:
+            self.resume()
 
     def delay_ms(self, t:int):
         eventLoop=QEventLoop()
@@ -92,6 +96,7 @@ class VideoPlayWorker(QObject):
     # def play_bak(self):
         # assert self.curr_frame_rate is not None
         # print("thread id of VideoPlayWorker is {}".format(QThread.currentThreadId()))
+        is_block = False
         while True:
             if self._isQuit and self.buffer_queue.empty():
                 break
@@ -181,7 +186,7 @@ class VideoPlayWorker(QObject):
 
             self.mutex.unlock()
 
-        LOGGER.debug("The frame loss rate of this video is {:.2f} %".format((1.0*self.drop_frame_counter/self.frame_counter)*100))
+        LOGGER.debug("The frame loss rate of this video is {:.2f} %".format((1.0*self.drop_frame_counter/(self.frame_counter+0.0001))*100))
         LOGGER.debug("VideoPlayWorker quit")
         self.quit_signal.emit(True)
 

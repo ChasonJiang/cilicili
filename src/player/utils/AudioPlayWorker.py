@@ -65,9 +65,11 @@ class AudioPlayWorker(QObject):
         
     def quit(self):
         self._isQuit = True
+        self.resume()
 
     def forcedQuit(self):
         self.forced_quit = True
+        self.resume()
 
     def delay_ms(self, t:int):
         eventLoop=QEventLoop()
@@ -78,6 +80,7 @@ class AudioPlayWorker(QObject):
     def play(self):
         # self.delay_ms(10)
         # assert self.curr_frame_rate is not None
+        is_block = False
         while True:
             
             if self._isQuit and self.buffer_queue.empty():
@@ -110,6 +113,7 @@ class AudioPlayWorker(QObject):
                     break
 
             buffer = self.buffer_queue.get(block=True)
+
             # self.delay_ms(60)
             # sleep(0.1)
             self.play_clock.updateClock(buffer["pts"])

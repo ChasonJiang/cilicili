@@ -122,7 +122,7 @@ def runPlayerWindow(srContext:SRContext):
             )
             
         player = PlayerWindow(srContext=srContext)
-        player.show()
+        player.hide()
         # player.play(media_info)
 
         await future

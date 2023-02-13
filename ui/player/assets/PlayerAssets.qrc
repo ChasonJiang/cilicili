@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="play_control_bar">
+    <file>full_screen_btn.svg</file>
+    <file>mute_btn.svg</file>
+    <file>pause_btn.svg</file>
+    <file>play_btn.svg</file>
+    <file>setting_btn.svg</file>
+    <file>small_screen_btn.svg</file>
+    <file>volume_btn.svg</file>
+  </qresource>
+  <qresource prefix="window_op">
+    <file>window_op_icon/close.svg</file>
+    <file>window_op_icon/max.svg</file>
+    <file>window_op_icon/min.svg</file>
+  </qresource>
+</RCC>

@@ -40,6 +40,7 @@ class VideoCard(QWidget,Ui_VideoCard):
         self.VideoTitle.installEventFilter(self)
         self.VideoAuthor.installEventFilter(self)
         self.PlayInfo.installEventFilter(self)
+        # self.setMouseTracking(False)
 
 
     def eventFilter(self, obj: 'QObject', e: 'QEvent') -> bool:
@@ -51,6 +52,7 @@ class VideoCard(QWidget,Ui_VideoCard):
                     return True
 
         return super().eventFilter(obj, e)
+
 
     @asyncSlot()
     async def toPlay(self):

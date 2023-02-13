@@ -81,15 +81,18 @@ class VideoDecoder(Thread):
                 # print("read video frame")
                 frame_bytes=self.decoder.stdout.read(frame_size)
                 if len(frame_bytes)==0:
-                    
-                    if zero_byte_counter>5:
-                        self.send(None)
-                        print("video decode over")
-                        LOGGER.info("video frame over")
-                        break
-                    zero_byte_counter+=1
-                    sleep(2)
-                    continue
+                    self.send(None)
+                    print("video decode over")
+                    LOGGER.info("video frame over")
+                    break
+                #     if zero_byte_counter>5:
+                #         self.send(None)
+                #         print("video decode over")
+                #         LOGGER.info("video frame over")
+                #         break
+                #     zero_byte_counter+=1
+                #     sleep(2)
+                #     continue
         
                 zero_byte_counter = 0
                 

@@ -73,8 +73,8 @@ class VideoDecoder(Thread):
         try:
             while True:
                 if self._isQuit:
-                    print("VideoDecoder quit")
-                    LOGGER.info("VideoDecoder quit")
+                    # print("VideoDecoder quit")
+                    # LOGGER.info("VideoDecoder quit")
                     # self.decoder.terminate()
                     break 
 
@@ -113,6 +113,7 @@ class VideoDecoder(Thread):
         finally:
             self.decoder.stdout.close()
             self.decoder.wait()
+            LOGGER.info("VideoDecoder quited")
 
     def init_decoder(self,video_context:VideoContext, ss:int=0):
         # print("video init_decoder")

@@ -63,7 +63,7 @@ class VideoDecodeWorker(QObject):
 
             while True:
                 if self._isQuit:
-                    LOGGER.info("VideoDecodeWorker quit")
+                    # LOGGER.info("VideoDecodeWorker quit")
                     self.sr_context.cmdPipe.send(HandlerCmd(HandlerCmd.QuitSRWorker))
                     self.clear_pipe()
                     self.sr_context.cmdPipe.send(HandlerCmd(HandlerCmd.QuitSRThread))
@@ -92,6 +92,8 @@ class VideoDecodeWorker(QObject):
             print(e)
             self.vbuffer_exception_signal.emit(curr_frame_pts)
             LOGGER.error(e)
+        finally:
+            LOGGER.info("VideoDecodeWorker quited")
 
         LOGGER.debug("total video frames {}".format(curr_frame_index+1))
 

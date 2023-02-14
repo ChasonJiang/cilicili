@@ -1,4 +1,5 @@
 
+import logging
 from multiprocessing.connection import PipeConnection
 import os
 from time import sleep
@@ -10,6 +11,8 @@ import torch
 from SuperResolution.Inferencer import Inferencer
 import numpy as np
 from PyQt5.QtCore import *
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class IMDN(Inferencer):
     def __init__(self,):
@@ -28,7 +31,7 @@ class IMDN(Inferencer):
         self.model.eval()
         self.model.to(self.device)
         self.ones = None
-        print("IMDN_RTC initialized")
+        LOGGER.debug("IMDN_RTC initialized")
 
     def process(self, frame_buffer_queue):
         
@@ -48,7 +51,7 @@ class IMDN(Inferencer):
             if self.ones is None:
                 self.ones = torch.ones((output.shape[0],output.shape[1],1), dtype=torch.uint8).cuda()
             output = torch.cat([output,self.ones ], dim=2)
-            print(f"frame time: {(time.perf_counter()-start_time)*1000} ms")
+            # print(f"frame time: {(time.perf_counter()-start_time)*1000} ms")
             output =  [output]
 
         # output = [torch.ones((frame.shape[0]*4, frame.shape[1]*4,4),dtype=torch.uint8).cuda()]

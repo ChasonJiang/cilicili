@@ -4,86 +4,83 @@ class PlayStatusController(QObject):
     update_status = pyqtSignal(bool)
     def __init__(self,):
         super(PlayStatusController, self).__init__()
-        self.Locker = QMutex()
-        self.awbFlag = False
-        self.abfFlag = False
-        self.vwbFlag = False
-        self.vbfFlag = False
-        self.aflag = False
-        self.vflag = False
-        self.aready = False
-        self.vready = False
-        self.isSendFalse = False
+        self.locker = QMutex()
+        self.audio_wait = False
+        self.video_wait = False
+        self.video_full = False
+        self.audio_full = False
+        self.in_period = False
+
 
     # 此函数将手动发起缓冲等待信号
     def wait_buffer_mode(self,):
-        self.Locker.lock()
-        self.abfFlag = False
-        self.awbFlag = True
-        self.vbfFlag = False
-        self.vwbFlag = True
-        self.aready = False
-        self.vready = False
-        self.send_not_ready()
-        self.Locker.unlock()
+        self.locker.lock()
+        self.audio_wait = True
+        self.video_wait = True
+        self.audio_full = False
+        self.video_full = False
+        self.in_period = True
+        self.locker.unlock()
 
 
     def audio_wait_buffer_slot(self):
-        self.Locker.lock()
-        if self.abfFlag:
-            self.awbFlag = False
-            self.abfFlag = False
-            self.aready = True
-            self.send_ready()
+        self.locker.lock()
+        if not self.in_period:
+            self.in_period = True
+            self.audio_wait = True
+            if not self.video_wait:
+                self.send_not_ready()
         else:
-            self.awbFlag = True
-            self.send_not_ready()
-        self.Locker.unlock()
+            self.audio_wait = True
+        self.locker.unlock()
 
     def audio_buffer_full_slot(self,):
-        self.Locker.lock()
-        if self.awbFlag:
-            self.abfFlag = False
-            self.awbFlag = False
-            self.aready = True
-            self.send_ready()
-        else:
-            self.abfFlag = True
-        
-        self.Locker.unlock()
+        self.locker.lock()
+        if self.in_period:
+            self.audio_full = True
+            if self.video_full:
+                self.send_ready()
+        # else:
+        #     # self.in_period = True
+        #     self.audio_full = True
+        self.locker.unlock()
 
     def video_wait_buffer_slot(self):
-        self.Locker.lock()
-        if self.vbfFlag == True:
-            self.vbfFlag = False
-            self.vwbFlag = False
-            self.vready = True
-            self.send_ready()
+        self.locker.lock()
+        if not self.in_period:
+            # self.in_period = True
+            self.video_wait = True
+            if not self.audio_wait:
+                self.send_not_ready()
         else:
-            self.vwbFlag = True
-            self.send_not_ready()
-        self.Locker.unlock()
+            self.video_wait = True
+        self.locker.unlock()
 
     def video_buffer_full_slot(self,):
-        self.Locker.lock()
-        if self.vwbFlag == True:
-            self.vwbFlag = False
-            self.vbfFlag = False
-            self.vready = True
-            self.send_ready()
-        else:
-            self.vbfFlag = True
-        self.Locker.unlock()
+        self.locker.lock()
+        if self.in_period:
+            self.video_full = True
+            if self.audio_full:
+                self.send_ready()
+        # else:
+        #     # self.in_period = True
+        #     self.video_full = True
+        self.locker.unlock()
 
+    def reset(self):
+        self.video_full = False
+        self.audio_full = False
+        self.video_wait = False
+        self.audio_wait = False
+        self.in_period = False
 
     def send_ready(self):
-        if self.aready and self.vready:
-            self.update_status.emit(True)
-            self.vready = False
-            self.aready = False
-            self.isSendFalse = False
+        # self.locker.lock()
+        self.update_status.emit(True)
+        self.reset()
+        # self.locker.unlock()
 
     def send_not_ready(self):
-        if not self.isSendFalse:
-            self.update_status.emit(False)
-            self.isSendFalse = True
+        # self.locker.lock()
+        self.update_status.emit(False)
+        # self.locker.unlock()

@@ -14,7 +14,7 @@ LOGGER=logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 
 class AudioPlayWorker(QObject):
-    wait_buffer_signal = pyqtSignal(bool)
+    wait_buffer_signal = pyqtSignal()
     pause_signal = pyqtSignal()
     resume_signal = pyqtSignal()
     quit_signal = pyqtSignal(bool)
@@ -50,12 +50,12 @@ class AudioPlayWorker(QObject):
         self.mutex.unlock()
 
     def pause(self):
-        LOGGER.debug("pause AudioPlayWorker")
+        # LOGGER.debug("pause AudioPlayWorker")
         self._isPause = True
 
     def resume(self):
         self.mutex.lock()
-        LOGGER.debug("resume AudioPlayWorker")
+        # LOGGER.debug("resume AudioPlayWorker")
         self._isPause = False
         self.cond.wakeAll()
         self.mutex.unlock()
@@ -65,11 +65,15 @@ class AudioPlayWorker(QObject):
         
     def quit(self):
         self._isQuit = True
-        self.resume()
+        # self.resume()
+        if self._isPause:
+            self.resume()
 
     def forcedQuit(self):
         self.forced_quit = True
-        self.resume()
+        # self.resume()
+        if self._isPause:
+            self.resume()
 
     def delay_ms(self, t:int):
         eventLoop=QEventLoop()
@@ -81,6 +85,7 @@ class AudioPlayWorker(QObject):
         # self.delay_ms(10)
         # assert self.curr_frame_rate is not None
         is_block = False
+        LOGGER.debug("audio play started")
         while True:
             
             if self._isQuit and self.buffer_queue.empty():
@@ -94,7 +99,7 @@ class AudioPlayWorker(QObject):
 
             self.mutex.lock()
             if self.buffer_queue.empty():
-                self.wait_buffer_signal.emit(True)
+                self.wait_buffer_signal.emit()
                 LOGGER.debug("Audio frame queue is empty")
                 self._isPause = True
 
@@ -111,6 +116,7 @@ class AudioPlayWorker(QObject):
                         self.buffer_queue.get_nowait()
                         self.buffer_queue.get_nowait()
                     break
+                LOGGER.debug("AudioPlayWorker resumed")
 
             buffer = self.buffer_queue.get(block=True)
 
@@ -122,6 +128,6 @@ class AudioPlayWorker(QObject):
 
             self.mutex.unlock()
 
-        LOGGER.debug("AudioPlayWorker quit")
+        LOGGER.debug("AudioPlayWorker quited")
         self.quit_signal.emit(True)   
 

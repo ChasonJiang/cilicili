@@ -20,7 +20,8 @@ from .SRContext import SRContext
 
 from .Inferencer import Inferencer
 from .SRStatusCode import SRStatusCode as SRSC
-LOGGER=logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 # class SRWorker(QObject):
 class SRWorker(Thread):
@@ -37,13 +38,13 @@ class SRWorker(Thread):
     def run(self):
         while True:
             if self._isQuit:
-                print("SRWorker quit")
                 break
             frames = self.inferencer.process(self.frame_buffer_queue)
 
             if frames is None:
-                print("SRWorker process over")
+                LOGGER.debug("SRWorker process over")
                 break
 
             for frame in frames:
                 self.sr_context.outputDataPipe.send(frame)
+        LOGGER.debug("SRWorker quited")

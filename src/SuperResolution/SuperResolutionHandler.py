@@ -20,7 +20,8 @@ from .SRWorker import SRWorker
 from .Inferencer import Inferencer
 from .HandlerCmd import HandlerCmd
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.INFO) # DEBUG
-LOGGER = logging.getLogger()
+LOGGER=logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 class SuperResolutionHandler(Process):
 
@@ -39,16 +40,17 @@ class SuperResolutionHandler(Process):
         self.frameBufferQueue = None
 
     
-    def init(self):
+    def initInferencer(self):
         
         self.loadInferencerInfo()
         self.loadInferencer(self.inferencerInfo["Inferencer"][self.inferencerInfo["Default"]]["ClassName"],
                             self.inferencerInfo["Inferencer"][self.inferencerInfo["Default"]]["ClassPath"]
                             )
+        LOGGER.debug("Inferencer inited")
 
     def run(self):
-        print("Running SuperResolutionHandler")
-        self.init()
+        LOGGER.debug("Run SuperResolutionHandler")
+        self.initInferencer()
         while True:
             # print("polling from SuperResolutionHandler")
             # if self.inCmdPipe.poll():
@@ -91,25 +93,29 @@ class SuperResolutionHandler(Process):
         if self.frameBufferQueue is not None:
             while not self.frameBufferQueue.empty():
                 self.frameBufferQueue.get_nowait()
+            LOGGER.debug("FrameBuffer cleaned")
 
 
     def quitVideoDecoder(self):
         # print("quitVideoDecoder")
         if self.videoDecoder is not None:
-            print("quit videoDecoder")
+            # print("quit videoDecoder")
             self.videoDecoder.quit()
+            LOGGER.debug("VideoDecoder quited")
 
     def quitSRWorker(self):
         # print("quitSRWorker")
         if self.srWorker is not None:
-            print("quit srWorker")
+            # print("quit srWorker")
             self.srWorker.quit()
+            LOGGER.debug("srWorker quited")
 
     def loadInferencerInfo(self):
-        print("Load Inferencer Info")
+        # print("Load Inferencer Info")
         try:
             with open(os.path.join(os.path.dirname(__file__),"SuperResolutionInferencer","SuperResolutionInferencerRegister.json"),"r") as f:
                 self.inferencerInfo = json.loads(f.read())
+            LOGGER.debug("Inferencer Info loaded")
         except IOError:
             print("Error reading SuperResolutionInferencerRegister.json")
             LOGGER.error("Error reading SuperResolutionInferencerRegister.json")
@@ -118,10 +124,11 @@ class SuperResolutionHandler(Process):
             # LOGGER.error(os.path.join(os.path.dirname(__file__),"SuperResolutionInferencer","SuperResolutionInferencerRegister.json"))
             
     def loadInferencer(self,className:str, classPath:str):
-        print("Load Inferencer")
+        # print("Load Inferencer")
         try:
             inferencer:Inferencer = classLoader("SuperResolution.SuperResolutionInferencer."+classPath,className)
             self.inferencer = inferencer()
+            LOGGER.debug("Inferencer loaded")
         except:
             print("LoadInferencer Error")
             LOGGER.error("LoadInferencer Error")

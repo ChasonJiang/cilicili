@@ -151,12 +151,13 @@ def start():
     # rtsr = Process(target=RTSR,)
     rtsr = SuperResolutionHandler(srh_srContext)
     # rtsr=Process(target=RTSR,args=[srh_srContext])
+    rtsr.start()
     playerWindow.start()
     mainWindow.start()
-    rtsr.start()
     rtsr.join()
-    mainWindow.join()
     playerWindow.join()
+    mainWindow.join()
+    
 
 
 

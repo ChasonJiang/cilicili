@@ -17,7 +17,7 @@ LOGGER.setLevel(logging.DEBUG)
 
 
 class VideoPlayWorker(QObject):
-    wait_buffer_signal = pyqtSignal(str)
+    wait_buffer_signal = pyqtSignal()
     pause_signal = pyqtSignal()
     resume_signal = pyqtSignal()
     quit_signal = pyqtSignal(bool)
@@ -67,12 +67,12 @@ class VideoPlayWorker(QObject):
         self.mutex.unlock()
 
     def pause(self):
-        LOGGER.debug("pause VideoPlayWorker")
+        # LOGGER.debug("pause VideoPlayWorker")
         self._isPause = True
 
     def resume(self):
         self.mutex.lock()
-        LOGGER.debug("resume VideoPlayWorker")
+        # LOGGER.debug("resume VideoPlayWorker")
         self._isPause = False
         self.cond.wakeAll()
         self.mutex.unlock()
@@ -97,6 +97,7 @@ class VideoPlayWorker(QObject):
         # assert self.curr_frame_rate is not None
         # print("thread id of VideoPlayWorker is {}".format(QThread.currentThreadId()))
         is_block = False
+        LOGGER.debug("video play started")
         while True:
             if self._isQuit and self.buffer_queue.empty():
                 break
@@ -109,7 +110,7 @@ class VideoPlayWorker(QObject):
 
             self.mutex.lock()
             if self.buffer_queue.empty():
-                self.wait_buffer_signal.emit("display_device")
+                self.wait_buffer_signal.emit()
                 LOGGER.debug("Video frame queue is empty")
                 self._isPause = True
 
@@ -117,7 +118,7 @@ class VideoPlayWorker(QObject):
                 LOGGER.debug("VideoPlayWorker paused")
                 # 使用QWaitCondition阻塞时，os调用wait_block的“瞬间”会释放mutex
                 self.cond.wait(self.mutex)
-
+                
                 if self._isQuit and self.buffer_queue.empty():
                     break
                 if self.forced_quit:
@@ -126,7 +127,7 @@ class VideoPlayWorker(QObject):
                         self.buffer_queue.get_nowait()
                         self.buffer_queue.get_nowait()
                     break
-
+                LOGGER.debug("VideoPlayWorker resumed")
 
             buffer = self.buffer_queue.get(block=True)
             self.frame_counter += 1
@@ -187,7 +188,7 @@ class VideoPlayWorker(QObject):
             self.mutex.unlock()
 
         LOGGER.debug("The frame loss rate of this video is {:.2f} %".format((1.0*self.drop_frame_counter/(self.frame_counter+0.0001))*100))
-        LOGGER.debug("VideoPlayWorker quit")
+        LOGGER.debug("VideoPlayWorker quited")
         self.quit_signal.emit(True)
 
 

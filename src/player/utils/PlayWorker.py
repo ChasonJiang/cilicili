@@ -331,7 +331,7 @@ class PlayWorker(QObject):
     def check_play_end(self,status:bool):
         if status:
             self.playEndStatus = True
-            LOGGER.info("Paly end")
+            LOGGER.info("Play end")
             self.play_end_signal.emit()
 
     def replay(self,):
@@ -371,7 +371,7 @@ class PlayWorker(QObject):
         # if not self.playStatus and not self.playEndStatus:
             # self.playStatus = True
         if not self.playEndStatus:
-            LOGGER.debug("paly resume")
+            LOGGER.debug("play resume")
             if self.videoPlayWorker is not None:
                 self.videoPlayWorker.resume_signal.emit()
             if self.audioPlayWorker is not None:
@@ -381,13 +381,14 @@ class PlayWorker(QObject):
         # if self.playStatus and not self.playEndStatus:
         #     self.playStatus = False
         if not self.playEndStatus:
-            LOGGER.debug("paly pause")
+            LOGGER.debug("play pause")
             if self.audioPlayWorker is not None:
                 self.audioPlayWorker.pause_signal.emit()
             if self.videoPlayWorker is not None:
                 self.videoPlayWorker.pause_signal.emit()
 
     def seek(self,ss:int,):
+        LOGGER.debug(f"seek to {ss}")
         # self.wait_buffer_signal.emit()
         self.quit_timer()
         self.quit_avdecode()
@@ -458,36 +459,38 @@ class PlayWorker(QObject):
                 self.audioFrameBufferQueue.get_nowait()
             except:
                 break
+        LOGGER.debug("avQueueBuffer cleaned")
 
     def quit_avdecode_worker(self):
         if self.videoDecodeWorker is not None:
-            LOGGER.debug("quit video decode worker")
+            # LOGGER.debug("quit video decode worker")
             self.videoDecodeWorker.quit()
             self.videoDecodeWorker = None
 
         if self.audioDecodeWorker is not None:
-            LOGGER.debug("quit audio decode worker")
+            # LOGGER.debug("quit audio decode worker")
             self.audioDecodeWorker.quit()
             self.audioDecodeWorker = None
 
     def quit_avdecode_thread(self):
         if self.videoDecodeThread is not None:
-            LOGGER.debug("quit video decode thread")
+            # LOGGER.debug("quit video decode thread")
             self.videoDecodeThread.quit()
             self.videoDecodeThread.wait()
             # self.videoDecodeThread.terminate()
             self.videoDecodeThread = None
-
+            LOGGER.debug("videoDecodeThread quited")
         if self.audioDecodeThread is not None:
-            LOGGER.debug("quit audio decode thread")
+            # 
             self.audioDecodeThread.quit()
             self.audioDecodeThread.wait()
             # self.audioDecodeThread.terminate()
             self.audioDecodeThread = None
+            LOGGER.debug("audioDecodeThread quited")
 
     def quit_avplay_worker(self,force:bool=False):
         if self.videoPlayWorker is not None:
-            LOGGER.debug("quit video play worker")
+            # LOGGER.debug("quit video play worker")
             if True:
                 self.videoPlayWorker.forcedQuit()
             else:
@@ -495,7 +498,7 @@ class PlayWorker(QObject):
             self.videoPlayWorker = None
 
         if self.audioPlayWorker is not None:
-            LOGGER.debug("quit audio play worker")
+            # LOGGER.debug("quit audio play worker")
             if force:
                 self.audioPlayWorker.forcedQuit()
             else:
@@ -505,16 +508,16 @@ class PlayWorker(QObject):
 
     def quit_avplay_thread(self):
         if self.videoPlayThread is not None:
-            LOGGER.debug("quit video play thread")
             self.videoPlayThread.quit()
             self.videoPlayThread.wait()
             self.videoPlayThread = None
+            LOGGER.debug("videoPlayThread quited")
 
         if self.audioPlayThread is not None:
-            LOGGER.debug("quit audio play thread")
             self.audioPlayThread.quit()
             self.audioPlayThread.wait()
             self.audioPlayThread = None
+            LOGGER.debug("audioPlayThread quited")
 
 
     def shutdown(self,force:bool=False):

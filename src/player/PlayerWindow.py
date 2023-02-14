@@ -77,7 +77,7 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
 
     @asyncSlot(dict)
     async def initVideoInfo(self,params:dict):
-        print(params)
+        LOGGER.debug(f"video info:\n{params}")
         aid = params['aid']
         bvid = params['bvid']
         credential=params['credential']
@@ -94,7 +94,8 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
     async def toPlay(self,cid:int=None,page_index:int=None):
         self.currentMediaInfoDict = await self.videoInfo.createMediaInfo(cid=cid,page_index=page_index)
         id = self.currentMediaInfoDict["defult"]
-        print(self.currentMediaInfoDict["media_info"][id][0].video_url)
+        video_url=self.currentMediaInfoDict["media_info"][id][0].video_url
+        LOGGER.debug(f"video link:\n{video_url}")
         self.play(self.currentMediaInfoDict["media_info"][id][0])
 
         

@@ -66,7 +66,7 @@ class AudioDecodeWorker(QObject):
         try:
             while True:
                 if  self._isQuit:
-                    LOGGER.info("AudioDecodeWorker quit")
+                    # LOGGER.info("AudioDecodeWorker quit")
                     break 
 
                 if self.buffer_queue.full():
@@ -109,6 +109,7 @@ class AudioDecodeWorker(QObject):
         finally:
             self.decoder.stdout.close()
             self.decoder.wait()
+            LOGGER.info("AudioDecodeWorker quited")
             
         LOGGER.debug("total audio frames {}".format(curr_frame_index+1))
         

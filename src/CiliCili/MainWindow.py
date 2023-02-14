@@ -22,6 +22,7 @@ class MainWindow(QWidget,Ui_MainWindow):
     load_card_signal = pyqtSignal(list)
     load_video_card_signal = pyqtSignal(list)
     to_play_signal = pyqtSignal(dict)
+    close_palyer_window_signal = pyqtSignal()
     def __init__(self,parent=None):
         super(MainWindow, self).__init__(parent=parent)
         # self.setAttribute(Qt.WA_TransparentForMouseEvents, False)
@@ -39,6 +40,10 @@ class MainWindow(QWidget,Ui_MainWindow):
         self.host.enableRemoting(self, 'MainWindow')
         self.initDragAndResize()
         self.scrollBar.valueChanged.connect(self.load)
+
+        self.CloseButton.clicked.connect(self.close)
+        self.MinButton.clicked.connect(self.showMinimized)
+        self.MaxButton.clicked.connect(self.showMaximized)
 
         # @asyncSlot()
         # async def fun():
@@ -169,6 +174,11 @@ class MainWindow(QWidget,Ui_MainWindow):
         # except Exception as e:
         #     print("请求异常! code segment: MainWindow.request")
             # return
+
+
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        self.close_palyer_window_signal.emit()
+        return super().closeEvent(a0)
 
 
 

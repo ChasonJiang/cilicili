@@ -55,6 +55,7 @@ class PlayWorker(QObject):
         self.inited = False
         self.play_signal.connect(self.play)
         self.play_locker = QMutex()
+        self.play_wait_buffer_locker = QMutex()
         self.play_pause_signal.connect(self.pause)
         self.play_resume_signal.connect(self.resume)
 
@@ -293,6 +294,7 @@ class PlayWorker(QObject):
         self.audioDecodeThread.started.connect(self.audioDecodeWorker.work)
 
     def play_wait_buffer_slot(self,status:bool):
+        self.play_wait_buffer_locker.lock()
         if status:
             LOGGER.debug("buffer ok")
             self.resume()
@@ -301,7 +303,7 @@ class PlayWorker(QObject):
             LOGGER.debug("wait buffer")
             self.pause()
             self.wait_buffer_signal.emit()
-
+        self.play_wait_buffer_locker.unlock()
 
     def update_progress(self,):
         # print(round(self.play_clock.curr_ts))

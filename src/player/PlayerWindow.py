@@ -27,7 +27,7 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         self.srContext:SRContext = srContext
         self.CiliCiliPlayer = CiliCiliPlayer(self,srContext)
         self.setupUi(self,self.CiliCiliPlayer)
-        self.CloseButton.clicked.connect(self.close)
+        self.CloseButton.clicked.connect(self._close)
         self.switch_full_screen_signal.connect(self.switchFullScreen)
 
         # 与MianWindow建立通信
@@ -57,6 +57,7 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
 
     def onInitialized(self):
         self.host.to_play_signal.connect(self.toShow)
+        self.host.close_palyer_window_signal.connect(self.close)
 
     @asyncSlot(dict)
     async def toShow(self,params:dict):
@@ -115,12 +116,10 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
 
     # def closeEvent(self, e:QCloseEvent) -> None:
     #     self.setHidden(True)
-        
 
-    def close(self):
+    def _close(self):
         self.setHidden(True)
         self.CiliCiliPlayer.pause_signal.emit()
-        return True
         
     def eventFilter(self, w: QObject, e: QEvent) -> bool:
         if w in [self.TopBar, self.InfoContainer, self.scrollArea, self.scrollAreaWidgetContents]:

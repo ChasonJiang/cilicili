@@ -77,7 +77,7 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
             # self.setWindowFlag(Qt.WindowStaysOnTopHint,False)
         if params["type"] == "video":
             await self.initVideoInfo(params)
-            self.toPlayVideo(params["data"]['cid'])
+            self.toPlayVideo(self.videoInfo.get_defult_cid())
         elif params["type"] == "episode":
             await self.initEpisodeInfo(params)
             self.toPlayEpisode(self.episodeInfo.get_defult_epid())

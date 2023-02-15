@@ -22,6 +22,7 @@ class VideoInfo():
 
     bvid = None
     aid = None
+    defult_cid = 0
     videoFormats:dict = {} 
     # cid = 
 
@@ -45,14 +46,15 @@ class VideoInfo():
         # assert self.credential is not None
         assert (self.aid is not None) or ( self.bvid is not None)
         self.info = await self.videoAPI.get_info()
+        self.defult_cid = await self.videoAPI.get_cid(0)
         self.loadInfo(self.info)
 
 
     def loadInfo(self,info:dict):
         pass
 
-    # def get_defult_cid(self):
-    #     return self.defult_cid
+    def get_defult_cid(self):
+        return self.defult_cid
 
     @asyncSlot()
     async def createMediaInfo(self,cid:int=None,page_index:int=None):

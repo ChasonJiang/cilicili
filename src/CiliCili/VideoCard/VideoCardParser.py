@@ -73,13 +73,18 @@ class VideoCardParser():
             _videoCardList = [self.videoParser(items[i],parent) for i in range(len(items))]
         elif data["from"] == "search":
             results = self.data["data"]
+            page = data["page"]
             _videoCardList = []
+            episodeList = []
+            videoList = []
             for result in results:
-                if result["result_type"] in ["media_bangumi","media_ft"] and len(result["data"])!=0:
+                if result["result_type"] in ["media_bangumi","media_ft"] and len(result["data"])!=0 and page==1:
                     for item in result["data"]:
-                        _videoCardList.append(self.episodeParser(item,parent))
-                # elif result["result_type"] == "video":
-                #     _videoCardList = [self.videoParser(item,parent) for item in result["data"]]
+                        episodeList.append(self.episodeParser(item,parent))
+                elif result["result_type"] == "video":
+                    for item in result["data"]:
+                        videoList.append(self.videoParser(item,parent))
+            _videoCardList = episodeList + videoList
         # print(data)
         
         return _videoCardList

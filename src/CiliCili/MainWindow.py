@@ -69,9 +69,9 @@ class MainWindow(QWidget,Ui_MainWindow):
         LOGGER.debug("RemoteObjects inited")
 
     def initSearchContext(self):
-        self.search_page = 0
+        self.search_page = 1
         self.search_keyword = None
-        self.search_max_page = 0
+        self.search_max_page = 1
         LOGGER.debug("SearchContext inited")
 
     def initContainer(self):
@@ -181,12 +181,13 @@ class MainWindow(QWidget,Ui_MainWindow):
                 "data":d
             }
         elif self.stackLayout.currentWidget() == self.searchPage:
-            if not self.search_page>self.search_max_page or self.search_keyword is None:
+            if not self.search_page>self.search_max_page and self.search_keyword is not None:
                 d = await search.search(keyword=self.search_keyword,page=self.search_page)
                 self.search_max_page = int(d["numPages"])
                 data = {
                     "from":"search",
-                    "data":d["result"]
+                    "data":d["result"],
+                    "page":self.search_page
                 }
                 self.search_page+=1
         return data

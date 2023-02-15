@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1800</width>
-    <height>1200</height>
+    <width>1600</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,13 +76,13 @@ border-radius: 10px 10px 10px 10px;
         </property>
         <property name="minimumSize">
          <size>
-          <width>65</width>
+          <width>66</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>65</width>
+          <width>66</width>
           <height>16777215</height>
          </size>
         </property>
@@ -115,17 +115,260 @@ border-bottom-left-radius: 10px;
           <number>0</number>
          </property>
          <property name="leftMargin">
-          <number>15</number>
+          <number>16</number>
          </property>
          <property name="topMargin">
-          <number>15</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>15</number>
+          <number>16</number>
          </property>
          <property name="bottomMargin">
-          <number>15</number>
+          <number>16</number>
          </property>
+         <item>
+          <widget class="QWidget" name="widget_2" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>70</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>70</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="BackButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#BackButton {
+image: url(:/main_window/main_window_icon/back.svg);
+background-color: rgba(0, 0, 0, 0);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}
+
+#BackButton:hover{
+image: url(:/main_window/main_window_icon/back.svg);
+background-color: rgb(230, 230, 230);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="pageSwitchWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>34</width>
+             <height>150</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>34</width>
+             <height>150</height>
+            </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="HomeButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#HomeButton {
+image: url(:/main_window/main_window_icon/home.svg);
+background-color: rgba(0, 0, 0, 0);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}
+
+#HomeButton:hover{
+image: url(:/main_window/main_window_icon/home.svg);
+background-color: rgb(230, 230, 230);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="SearchButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#SearchButton {
+image: url(:/main_window/main_window_icon/search.svg);
+background-color: rgba(0, 0, 0, 0);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}
+
+#SearchButton:hover{
+image: url(:/main_window/main_window_icon/search.svg);
+background-color: rgb(230, 230, 230);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
@@ -149,7 +392,13 @@ border-bottom-left-radius: 10px;
            </property>
            <property name="minimumSize">
             <size>
-             <width>0</width>
+             <width>34</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>34</width>
              <height>100</height>
             </size>
            </property>
@@ -161,13 +410,13 @@ border-bottom-left-radius: 10px;
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="topMargin">
              <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="bottomMargin">
              <number>0</number>
@@ -716,8 +965,8 @@ background-color:rgba(0,0,0,0);
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>1735</width>
-                 <height>1130</height>
+                 <width>1534</width>
+                 <height>830</height>
                 </rect>
                </property>
                <property name="sizePolicy">
@@ -746,7 +995,7 @@ background-color:rgba(0,0,0,0);
   </layout>
  </widget>
  <resources>
-  <include location="../assets.qrc"/>
+  <include location="assets/assets.qrc"/>
  </resources>
  <connections/>
 </ui>

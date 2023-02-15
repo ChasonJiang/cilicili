@@ -1,4 +1,4 @@
-from bilibili_api import Credential,video
+from bilibili_api import Credential,bangumi
 from qasync import asyncSlot
 import aiohttp
 from player.utils.MediaInfo import MediaInfo
@@ -15,48 +15,60 @@ HEADERS={
 # USER_AGENT = "\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56\""
 
 
-class VideoInfo():
-    videoAPI:video.Video = None
+class EpisodeInfo():
+    video:bangumi.Bangumi = None
     info:dict = None
     credential = None
 
-    bvid = None
-    aid = None
+    media_id = -1
+    ssid = -1
+    epid = -1
+    episodeObjList:list = None
+    episodeObjDict:dict = {}
+    defult_epid = -1
     videoFormats:dict = {} 
     # cid = 
 
 
-    def __init__(self,bvid:str=None,aid:int=None,credential:Credential=None):
-        if bvid or aid:
-            self.init(bvid,aid,credential)
+    def __init__(self,media_id:int=-1,ssid:int=-1,epid:int=-1,credential:Credential=None):
+        if media_id !=-1 or ssid !=-1 or epid !=-1:
+            self.init(media_id,ssid,epid,credential)
         # pass
 
-    def init(self,bvid:str=None,aid:int=None,credential:Credential=None):
-        self.bvid = bvid
-        self.aid = aid
+    def init(self,media_id:int=-1,ssid:int=-1,epid:int=-1,credential:Credential=None):
+        self.media_id = media_id
+        self.ssid = ssid
+        self.epid = epid
         self.credential = credential
-        self.videoAPI = video.Video(bvid=self.bvid, aid=self.aid, credential=credential)
+        self.videoAPI = bangumi.Bangumi(media_id=self.media_id, ssid=self.ssid, epid=self.epid, credential=credential)
 
     @asyncSlot()
-    async def requestInfo(self,bvid:str=None,aid:int=None,credential:Credential=None):
-        self.bvid = bvid if bvid is not None else self.bvid
-        self.aid = aid if aid is not None else self.aid
+    async def requestInfo(self,media_id:int=-1,ssid:int=-1,epid:int=-1,credential:Credential=None):
+        self.media_id = media_id if media_id == -1 else self.media_id
+        self.ssid = ssid if ssid == -1 else self.ssid
+        self.epid = epid if epid == -1 else self.epid
         self.credential = credential if credential is None else self.credential
         # assert self.credential is not None
-        assert (self.aid is not None) or ( self.bvid is not None)
-        self.info = await self.videoAPI.get_info()
+        assert (self.media_id != -1) or ( self.ssid != -1)
+        self.info = await self.videoAPI.get_meta()
+        self.episodeObjList = await self.videoAPI.get_episodes()
+        for episodeObj in self.episodeObjList:
+            self.episodeObjDict[episodeObj.get_epid()] = episodeObj
+
+        self.defult_epid = self.episodeObjList[0].get_epid()
         self.loadInfo(self.info)
 
+    def get_defult_epid(self):
+        return self.defult_epid
 
     def loadInfo(self,info:dict):
+        print(info)
         pass
 
-    # def get_defult_cid(self):
-    #     return self.defult_cid
-
     @asyncSlot()
-    async def createMediaInfo(self,cid:int=None,page_index:int=None):
-        content= await self.videoAPI.get_download_url(page_index=page_index,cid=cid)
+    async def createMediaInfo(self,epid:int):
+        episodeObj:bangumi.Episode = self.episodeObjDict[epid]
+        content = await episodeObj.get_download_url()
         self.setVideoFormat(content["support_formats"])
         dash = content["dash"]
         return self.packUpMediaInfo(dash)
@@ -75,7 +87,7 @@ class VideoInfo():
         audio = self.chooseAudio(dash["audio"])
         mediaInfoDict={}
         best_id = 0
-        bed_id = 0
+        bed_id = 999999999
         for item in dash["video"]:
             id = item["id"]
             if id>best_id:

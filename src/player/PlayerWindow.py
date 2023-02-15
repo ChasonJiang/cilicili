@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from qasync import asyncSlot
+from CiliCili.VideoInfo.EpisodeInfo import EpisodeInfo
 
 from CiliCili.VideoInfo.VideoInfo import VideoInfo
 
@@ -38,6 +39,7 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         self.host.initialized.connect(self.onInitialized)
 
         self.videoInfo:VideoInfo = VideoInfo()
+        self.episodeInfo:EpisodeInfo = EpisodeInfo()
         self.curr_cid = None
         self.currentMediaInfoDict = None
         self.setMouseTracking(True)
@@ -74,14 +76,25 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
             # self.raise_()
             # self.setWindowFlag(Qt.WindowStaysOnTopHint,False)
         if params["type"] == "video":
-            self.initVideoInfo(params)
+            await self.initVideoInfo(params)
+            self.toPlayVideo(params["data"]['cid'])
         elif params["type"] == "episode":
-            self.initEpisodeInfo(params)
+            await self.initEpisodeInfo(params)
+            self.toPlayEpisode(self.episodeInfo.get_defult_epid())
 
     @asyncSlot(dict)
     async def initEpisodeInfo(self,params:dict):
         LOGGER.debug(f"episode info:\n{params}")
-    
+        media_id = params["data"]['media_id']
+        season_id = params["data"]['season_id']
+        # episode_id = params["data"]['episode_id']
+        credential=params['credential']
+
+        self.episodeInfo.init(media_id=media_id,ssid=season_id,credential=credential)
+        await self.episodeInfo.requestInfo(media_id=media_id,
+                                        ssid=season_id,
+                                        credential=credential)
+
 
     @asyncSlot(dict)
     async def initVideoInfo(self,params:dict):
@@ -89,18 +102,23 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         aid = params["data"]['aid']
         bvid = params["data"]['bvid']
         credential=params['credential']
-        cid = params["data"]['cid']
+        # cid = params["data"]['cid']
 
         self.videoInfo.init(aid=aid,bvid=bvid,credential=credential)
         await self.videoInfo.requestInfo(bvid=bvid,
                                         aid=aid,
                                         credential=credential)
+    @asyncSlot(int)
+    async def toPlayEpisode(self,epid:int):
+        self.currentMediaInfoDict = await self.episodeInfo.createMediaInfo(epid=epid)
+        id = self.currentMediaInfoDict["defult"]
+        video_url=self.currentMediaInfoDict["media_info"][id][0].video_url
+        LOGGER.debug(f"episode link:\n{video_url}")
+        self.play(self.currentMediaInfoDict["media_info"][id][0])
 
-        await self.toPlay(cid=cid)
-
-    @asyncSlot()
-    async def toPlay(self,cid:int=None,page_index:int=None):
-        self.currentMediaInfoDict = await self.videoInfo.createMediaInfo(cid=cid,page_index=page_index)
+    @asyncSlot(int)
+    async def toPlayVideo(self,cid:int):
+        self.currentMediaInfoDict = await self.videoInfo.createMediaInfo(cid=cid)
         id = self.currentMediaInfoDict["defult"]
         video_url=self.currentMediaInfoDict["media_info"][id][0].video_url
         LOGGER.debug(f"video link:\n{video_url}")

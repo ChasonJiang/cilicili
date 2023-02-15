@@ -115,7 +115,7 @@ class MainWindow(QWidget,Ui_MainWindow):
         for index in range(len(self.pageList)):
             self.pageIndexDict[self.pageList[index]]=index
             self.stackLayout.insertWidget(index, self.pageList[index])
-            self.pageFlowLayoutList.append(FlowLayout(self.pageList[index],30,20,20))
+            self.pageFlowLayoutList.append(FlowLayout(self.pageList[index],30,20,30))
 
         #记录用户选择page的index
         self.pageIndexStack = []

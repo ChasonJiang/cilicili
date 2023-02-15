@@ -22,8 +22,8 @@ class Ui_VideoCard(object):
         VideoCard.setSizePolicy(sizePolicy)
         VideoCard.setMinimumSize(QtCore.QSize(242, 222))
         VideoCard.setStyleSheet("*{\n"
-"background-color: rgba(123,123,34,255);\n"
-# "background-color: rgba(0,0,0,0);"
+# "background-color: rgba(123,123,34,255);\n"
+"background-color: rgba(0,0,0,0);"
 "margin:0px;\n"
 "padding:0px;\n"
 "}")

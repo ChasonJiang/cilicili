@@ -10,19 +10,41 @@ import aiohttp
 
 class VideoCard(QWidget,Ui_VideoCard):
 
-    aid=None
-    bvid=None
-    cid=None
-    uri=None
     pic=None
     title=None
-    duration=None
-    pubdate=None
-    owner=None
-    stat=None
-    is_followed=None
-    rcmd_reason=None
+    authorInfo=None
+    dateInfo=None
+    type = None
+    data = None
     credential = None
+
+    """
+        type is a string, "video" or "episode" 
+
+        data is a dictionary
+        like this:
+        {
+            "aid":,
+            "bvid":,
+            "cid":,
+            "title":,
+            "description":,
+            "owner":{
+                "name":,
+                "mid":,
+                "face":,
+            }
+        }
+        or
+        {
+            "title":,
+            "media_id":,
+            "season_id":,
+            "description":,
+        }
+
+    """
+
 
     load_info_signal = pyqtSignal()
 
@@ -54,16 +76,13 @@ class VideoCard(QWidget,Ui_VideoCard):
         return super().eventFilter(obj, e)
 
 
-    @asyncSlot()
-    async def toPlay(self):
-        d= {
-            "aid":self.aid,
-            "bvid":self.bvid,
-            "cid":self.cid,
-            "title":self.title,
+    @asyncSlot(str)
+    async def toPlay(self,):
+        d={
+            "type":self.type,
+            "data":self.data,
             "credential":self.credential
         }
-
         # videoInfo=VideoInfo(self.bvid,self.aid)
         # await videoInfo.requestData()
         # print(videoInfo.info)
@@ -72,8 +91,9 @@ class VideoCard(QWidget,Ui_VideoCard):
     @asyncSlot()
     async def loadInfo(self):
         # print("loadInfo:",str(self.title))
-        self.VideoTitle.setText(str(self.title))
-        self.PlayInfo.setText(str(self.bvid))
+        self.VideoTitle.setText(self.title)
+        self.VideoAuthor.setText(self.authorInfo)
+        self.PlayInfo.setText(self.dateInfo)
         await self.setCover(self.pic)
         
         
@@ -87,6 +107,6 @@ class VideoCard(QWidget,Ui_VideoCard):
             img = await content.read()
             qpixmap = QPixmap()
             qpixmap.loadFromData(img)
-            # img.scaled(self.VideoCover.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            qpixmap.scaled(self.VideoCover.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode .SmoothTransformation)
             self.VideoCover.setScaledContents(True)
             self.VideoCover.setPixmap(qpixmap)

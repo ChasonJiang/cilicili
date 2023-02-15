@@ -73,16 +73,23 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         self.show()
             # self.raise_()
             # self.setWindowFlag(Qt.WindowStaysOnTopHint,False)
-        self.initVideoInfo(params)
+        if params["type"] == "video":
+            self.initVideoInfo(params)
+        elif params["type"] == "episode":
+            self.initEpisodeInfo(params)
+
+    @asyncSlot(dict)
+    async def initEpisodeInfo(self,params:dict):
+        LOGGER.debug(f"episode info:\n{params}")
     
 
     @asyncSlot(dict)
     async def initVideoInfo(self,params:dict):
         LOGGER.debug(f"video info:\n{params}")
-        aid = params['aid']
-        bvid = params['bvid']
+        aid = params["data"]['aid']
+        bvid = params["data"]['bvid']
         credential=params['credential']
-        cid = params['cid']
+        cid = params["data"]['cid']
 
         self.videoInfo.init(aid=aid,bvid=bvid,credential=credential)
         await self.videoInfo.requestInfo(bvid=bvid,

@@ -75,7 +75,7 @@ class VideoInfo():
         audio = self.chooseAudio(dash["audio"])
         mediaInfoDict={}
         best_id = 0
-        bed_id = 0
+        bed_id = 999999999
         for item in dash["video"]:
             id = item["id"]
             if id>best_id:

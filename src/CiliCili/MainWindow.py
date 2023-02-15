@@ -36,9 +36,10 @@ class MainWindow(QWidget,Ui_MainWindow):
         self.loop = asyncio.get_event_loop()
         self.setupUi(self)
         self.initContainer()
+        self.initDragAndResize()
         self.initRemoteObjects()
         self.initConnection()
-        self.initDragAndResize()
+        
         self.initSearchContext()
         self.videoCardParser = VideoCardParser()
 
@@ -145,11 +146,14 @@ class MainWindow(QWidget,Ui_MainWindow):
     
     @asyncSlot()
     async def search(self):
+        keyword = self.SearchBox.text()
+        if keyword is None or len(keyword)==0:
+            return
         self.initSearchContext()
         flowLayout =self.pageFlowLayoutList[self.currentPageIndex]
         flowLayout.clear()
         self.switchPage(self.searchPage)
-        self.search_keyword = self.SearchBox.text()
+        self.search_keyword = keyword
         LOGGER.debug(f"searching {self.search_keyword}")
         data = await self.request()
         if data is None:
@@ -217,19 +221,23 @@ class MainWindow(QWidget,Ui_MainWindow):
         self.Container.setMouseTracking(True)
         self.scrollArea.setMouseTracking(True)
         self.scrollAreaContents.setMouseTracking(True)
+        self.homePage.setMouseTracking(True)
+        self.searchPage.setMouseTracking(True)
         self.TopBar.installEventFilter(self)
         self.LeftBar.installEventFilter(self)
         self.MainContainer.installEventFilter(self)
         self.Container.installEventFilter(self)
         self.scrollArea.installEventFilter(self)
         self.scrollAreaContents.installEventFilter(self)
+        self.homePage.installEventFilter(self)
+        self.searchPage.installEventFilter(self)
         # self.initDrag()
         self.mouseTriggerReset()
         self.relativePos = None
         self.resizeBorderThreshold = 4
 
     def eventFilter(self, w: QObject, e: QEvent) -> bool:
-        if w in [self.TopBar, self.LeftBar, self.Container, self.scrollArea, self.scrollAreaContents]:
+        if w in [self.TopBar, self.LeftBar, self.Container, self.scrollArea, self.scrollAreaContents,self.homePage, self.searchPage]:
             e_type = e.type()
             if e_type == QEvent.Type.MouseButtonPress:
                 if e.button() == Qt.LeftButton:

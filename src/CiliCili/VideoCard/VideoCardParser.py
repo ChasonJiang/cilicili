@@ -98,7 +98,7 @@ class VideoCardParser():
         videoCard.data=d
         videoCard.pic = data["cover"]
         videoCard.title = data["title"]
-        timeArray = time.localtime(float(data["pubtime"]))
+        timeArray = time.localtime(float(abs(data["pubtime"])))
         otherStyleTime = time.strftime("%Y-%m-%d-%H:%M", timeArray)
         videoCard.authorInfo = data["season_type_name"] +" "+otherStyleTime
         videoCard.dateInfo = "评分: "+str(data["media_score"]["score"]) + " " + str(data["index_show"])
@@ -130,7 +130,7 @@ class VideoCardParser():
             }
         data["title"] = item["title"]
         videoCard.data = data
-        timeArray = time.localtime(float(item["pubdate"]))
+        timeArray = time.localtime(abs(float(item["pubdate"])))
         otherStyleTime = time.strftime("%Y-%m-%d-%H:%M", timeArray)
         videoCard.authorInfo = data["owner"]["name"] +"  "+otherStyleTime
         if "stat" in item_keys:

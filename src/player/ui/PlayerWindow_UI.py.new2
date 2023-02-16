@@ -478,7 +478,7 @@ class Ui_PlayerWindow(object):
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_8.setSpacing(0)
         self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.EpisodeListBox = QtWidgets.QListView(self.widget_6)
+        self.EpisodeListBox = QtWidgets.QListWidget(self.widget_6)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -492,11 +492,8 @@ class Ui_PlayerWindow(object):
 "}")
         self.EpisodeListBox.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.EpisodeListBox.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.EpisodeListBox.setLineWidth(0)
         self.EpisodeListBox.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.EpisodeListBox.setAutoScroll(False)
-        self.EpisodeListBox.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
-        self.EpisodeListBox.setDefaultDropAction(QtCore.Qt.IgnoreAction)
+        self.EpisodeListBox.setTextElideMode(QtCore.Qt.ElideRight)
         self.EpisodeListBox.setObjectName("EpisodeListBox")
         self.verticalLayout_8.addWidget(self.EpisodeListBox)
         self.verticalLayout_9.addWidget(self.widget_6)
@@ -525,3 +522,4 @@ class Ui_PlayerWindow(object):
         self.label.setText(_translate("PlayerWindow", "TextLabel"))
         self.EpisodeLabel.setText(_translate("PlayerWindow", "分集"))
 from .PlayerAssets import * 
+

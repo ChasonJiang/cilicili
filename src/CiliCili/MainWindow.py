@@ -53,7 +53,12 @@ class MainWindow(QWidget,Ui_MainWindow):
         self.RefreshButton.clicked.connect(self.refresh)
         self.CloseButton.clicked.connect(self.close)
         self.MinButton.clicked.connect(self.showMinimized)
-        self.MaxButton.clicked.connect(self.showMaximized)
+        def showMax():
+            if self.isMaximized():
+                self.showNormal()
+            else:
+                self.showMaximized()
+        self.MaxButton.clicked.connect(showMax)
         self.SearchBox.returnPressed.connect(self.search)
         self.SearchButton.clicked.connect(lambda :self.switchPage(self.searchPage))
         self.HomeButton.clicked.connect(lambda :self.switchPage(self.homePage))

@@ -28,13 +28,12 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         self.srContext:SRContext = srContext
         self.CiliCiliPlayer = CiliCiliPlayer(self,srContext)
         self.setupUi(self,self.CiliCiliPlayer)
-        self.CloseButton.clicked.connect(self._close)
-        self.switch_full_screen_signal.connect(self.switchFullScreen)
+        self.DescriptionBox.setHidden(True)
+        self.initConnection()
 
         # 与MianWindow建立通信
         self.node = QRemoteObjectNode(parent=self)
         self.node.connectToNode(QUrl("local:MainWindow"))
-
         self.host = self.node.acquireDynamic('MainWindow')
         self.host.initialized.connect(self.onInitialized)
 
@@ -42,6 +41,32 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         self.episodeInfo:EpisodeInfo = EpisodeInfo()
         self.curr_cid = None
         self.currentMediaInfoDict = None
+
+        self.currentPlayType = None
+
+        self.initMoveAndResize()
+
+    def initConnection(self):
+        self.CloseButton.clicked.connect(self._close)
+        self.switch_full_screen_signal.connect(self.switchFullScreen)
+        self.MinButton.clicked.connect(self.showMinimized)
+        def showMax():
+            if self.isMaximized():
+                self.showNormal()
+            else:
+                self.showMaximized()
+        self.MaxButton.clicked.connect(showMax)
+        def extendSwitcher():
+            if self.ExtendButton.text() == "展开":
+                self.ExtendButton.setText("收起")
+                self.DescriptionBox.setHidden(False)
+            else:
+                self.ExtendButton.setText("展开")
+                self.DescriptionBox.setHidden(True)
+        self.ExtendButton.clicked.connect(extendSwitcher)
+        self.EpisodeListBox.clicked.connect(self.selectEpisode)
+
+    def initMoveAndResize(self):
         self.setMouseTracking(True)
         self.TopBar.setMouseTracking(True)
         self.Container.setMouseTracking(True)
@@ -69,18 +94,41 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
             # self.setWindowFlag(Qt.WindowStaysOnTopHint,True)
         # if not self.isActiveWindow():
         #     self.activateWindow()
+        self.resetPlayerContext()
         self.setWindowFlag(Qt.WindowStaysOnTopHint,True)
         self.show()
         self.setWindowFlag(Qt.WindowStaysOnTopHint,False)
         self.show()
             # self.raise_()
             # self.setWindowFlag(Qt.WindowStaysOnTopHint,False)
+        
         if params["type"] == "video":
             await self.initVideoInfo(params)
             self.toPlayVideo(self.videoInfo.get_defult_cid())
         elif params["type"] == "episode":
             await self.initEpisodeInfo(params)
             self.toPlayEpisode(self.episodeInfo.get_defult_epid())
+
+    def resetPlayerContext(self):
+        self.ExtendButton.setText("展开")
+        self.DescriptionBox.setHidden(True)
+        self.EpisodeBox.setHidden(True)
+
+    def showEpisodeBox(self,episodeList):
+        stringListModel=QStringListModel()
+        stringListModel.setStringList(episodeList)
+        self.EpisodeListBox.setModel(stringListModel)
+        self.EpisodeBox.setHidden(False)
+
+    @asyncSlot(QModelIndex)
+    async def selectEpisode(self,index:QModelIndex):
+        if self.currentPlayType == "episode":
+            epid = self.indexToEpid[index.row()]
+            await self.toPlayEpisode(epid)
+        elif self.currentPlayType =="video":
+            cid = self.indexToCid[index.row()]
+            await self.toPlayVideo(cid)
+        
 
     @asyncSlot(dict)
     async def initEpisodeInfo(self,params:dict):
@@ -94,6 +142,25 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         await self.episodeInfo.requestInfo(media_id=media_id,
                                         ssid=season_id,
                                         credential=credential)
+        self.loadEpisodeInfo(self.episodeInfo.info)
+
+    def loadEpisodeInfo(self,info:dict):
+        self.TitleBox.setText(info["title"])
+        self.PlayInfoBox.setText(info["playInfo"])
+        self.VideoIdBox.setText(str(info["id"]))
+        self.DescriptionBox.setText(info["description"])
+        self.currentPlayType = info["type"]
+        self.indexToEpid ={}
+        episodeList = []
+        epids=info["epids"]
+        LOGGER.debug(f"epid length: {len(epids)}")
+        for index in range(len(epids)):
+            title =epids[index]["title"]
+            episodeList.append(title)
+            self.indexToEpid[index] = epids[index]["epid"]
+        self.showEpisodeBox(episodeList)
+
+
 
 
     @asyncSlot(dict)
@@ -108,6 +175,25 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         await self.videoInfo.requestInfo(bvid=bvid,
                                         aid=aid,
                                         credential=credential)
+        self.loadVideoInfo(self.videoInfo.info)
+
+    def loadVideoInfo(self,info:dict):
+        self.TitleBox.setText(info["title"])
+        self.PlayInfoBox.setText(info["playInfo"])
+        self.VideoIdBox.setText(str(info["id"]))
+        self.DescriptionBox.setText(info["description"])
+        self.currentPlayType = info["type"]
+        self.indexToCid ={}
+        cids = info["cids"]
+        LOGGER.debug(f"cid length: {len(cids)}")
+        if len(cids)>1:
+            episodeList = []
+            for index in range(len(cids)):
+                title =cids[index]["title"]
+                episodeList.append(title)
+                self.indexToCid[index] = cids[index]["cid"]
+            self.showEpisodeBox(episodeList)
+
     @asyncSlot(int)
     async def toPlayEpisode(self,epid:int):
         self.currentMediaInfoDict = await self.episodeInfo.createMediaInfo(epid=epid)

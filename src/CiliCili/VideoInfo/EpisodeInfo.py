@@ -1,6 +1,7 @@
 from bilibili_api import Credential,bangumi
 from qasync import asyncSlot
 import aiohttp
+import time
 from player.utils.MediaInfo import MediaInfo
 
 HEADERS={
@@ -50,20 +51,52 @@ class EpisodeInfo():
         self.credential = credential if credential is None else self.credential
         # assert self.credential is not None
         assert (self.media_id != -1) or ( self.ssid != -1)
-        self.info = await self.videoAPI.get_meta()
+        info = await self.videoAPI.get_overview()
+
         self.episodeObjList = await self.videoAPI.get_episodes()
+        episodeList=[]
+        counter =0
         for episodeObj in self.episodeObjList:
             self.episodeObjDict[episodeObj.get_epid()] = episodeObj
+            epid = episodeObj.get_epid()
+            # ep_info=await episodeObj.get_episode_info()
+            # title = ep_info["h1Title"]
+            counter +=1
+            title = f"第{counter}话"
+            episodeList.append({
+                "epid":epid,
+                "title":title
+            })
 
         self.defult_epid = self.episodeObjList[0].get_epid()
-        self.loadInfo(self.info)
+        self.loadInfo(info,episodeList)
 
     def get_defult_epid(self):
         return self.defult_epid
 
-    def loadInfo(self,info:dict):
-        print(info)
-        pass
+    def loadInfo(self,info:dict,episodeList:list):
+        pubdate = info["publish"]["pub_time"]
+        num_views = info["stat"]["views"]
+        num_like = info["stat"]["likes"]
+        self.info = {
+            "type":"episode",
+            "title":info["title"],
+            "id":info["media_id"],
+            "description":info["evaluate"],
+            "playInfo":"播放: {} 点赞: {}  {}".format(num_views,num_like,pubdate),
+            "epids":episodeList
+        }
+        """
+            epids like this:
+            [
+                {
+                    "title":<title>,
+                    "epid":<cid>
+                },
+                ...
+            ]
+        """
+
 
     @asyncSlot()
     async def createMediaInfo(self,epid:int):

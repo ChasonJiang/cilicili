@@ -1,6 +1,7 @@
 from bilibili_api import Credential,video
 from qasync import asyncSlot
 import aiohttp
+import time
 from player.utils.MediaInfo import MediaInfo
 
 HEADERS={
@@ -45,13 +46,51 @@ class VideoInfo():
         self.credential = credential if credential is None else self.credential
         # assert self.credential is not None
         assert (self.aid is not None) or ( self.bvid is not None)
-        self.info = await self.videoAPI.get_info()
-        self.defult_cid = await self.videoAPI.get_cid(0)
-        self.loadInfo(self.info)
+        info = await self.videoAPI.get_info()
+        cid_list = []
+        for item in info["pages"]:
+            cid = item["cid"]
+            cidDict = {
+                "title":item["part"],
+                "cid":cid,
+            }
+            cid_list.append(cidDict)
+        self.defult_cid = cid_list[0]["cid"]
+
+        self.loadInfo(info,cid_list)
 
 
-    def loadInfo(self,info:dict):
-        pass
+    def loadInfo(self,info:dict,cid_list:list):
+        info_keys = info.keys()
+        timeArray = time.localtime(float(abs(info["pubdate"])))
+        pubdate = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+        num_views = info["stat"]["view"]
+        num_like = info["stat"]["like"]
+        desc_v2 = info["desc_v2"][0]
+        desc = ""
+        if desc_v2["type"] == 1:
+            desc = desc_v2["raw_text"]
+        else:
+            desc = desc_v2["raw_text"] + "  @"+str(desc_v2["biz_id"])
+
+        self.info = {
+            "type":"video",
+            "title":info["title"],
+            "id":info["bvid"] if "bvid" in info_keys else info["aid"],
+            "description":desc,
+            "playInfo":"播放: {} 点赞: {}  {}".format(num_views,num_like,pubdate),
+            "cids":cid_list
+        }
+        """
+            cids like this:
+            [
+                {
+                    "title":<title>,
+                    "cid":<cid>
+                },
+                ...
+            ]
+        """
 
     def get_defult_cid(self):
         return self.defult_cid

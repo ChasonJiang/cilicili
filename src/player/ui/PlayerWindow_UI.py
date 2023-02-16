@@ -393,6 +393,7 @@ class Ui_PlayerWindow(object):
         self.ExtendButton.setObjectName("ExtendButton")
         self.verticalLayout_5.addWidget(self.ExtendButton)
         self.label = QtWidgets.QLabel(self.widget_4)
+        self.label.setText("")
         self.label.setObjectName("label")
         self.verticalLayout_5.addWidget(self.label)
         self.horizontalLayout_5.addWidget(self.widget_4)
@@ -522,6 +523,5 @@ class Ui_PlayerWindow(object):
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.ExtendButton.setText(_translate("PlayerWindow", "展开"))
-        self.label.setText(_translate("PlayerWindow", "TextLabel"))
         self.EpisodeLabel.setText(_translate("PlayerWindow", "分集"))
 from .PlayerAssets import * 

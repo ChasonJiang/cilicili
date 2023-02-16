@@ -85,6 +85,10 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
     def onInitialized(self):
         self.host.to_play_signal.connect(self.toShow)
         self.host.close_palyer_window_signal.connect(self.close)
+    
+    def closeEvent(self, e: QCloseEvent) -> None:
+        self.CiliCiliPlayer.close()
+        return super().closeEvent(e)
 
     @asyncSlot(dict)
     async def toShow(self,params:dict):

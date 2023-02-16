@@ -87,7 +87,7 @@ class SuperResolutionHandler(Process):
                 
                 # self.quitSRThread()
                 continue
-
+        LOGGER.debug("SuperResolutionHandler Quited")
     def clearFrameBuffer(self):
         # print("clearFrameBuffer")
         if self.frameBufferQueue is not None:

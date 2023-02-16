@@ -104,6 +104,7 @@ class CiliCiliPlayer(QWidget):
             self.playThread.quit()
             self.playThread.wait()
         self.srContext.cmdPipe.send(HandlerCmd(HandlerCmd.Quit))
+        LOGGER.debug("CiliCiliPlayer shutdown")
 
 
 

@@ -873,7 +873,7 @@ border:0;
                       <item>
                        <widget class="QLabel" name="label">
                         <property name="text">
-                         <string>TextLabel</string>
+                         <string/>
                         </property>
                        </widget>
                       </item>

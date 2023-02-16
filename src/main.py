@@ -56,17 +56,23 @@ def Application(args:list):
 
 def runMainWindow():
     async def run():
-        def close_future(future, loop):
+        def close_future(future, loop,app):
+            if app.my_is_closed:
+                return
+            else:
+                app.my_is_closed = True
+            print("close MainWindow")
             loop.call_later(10, future.cancel)
             future.cancel()
-
+        
         loop = asyncio.get_event_loop()
         future = asyncio.Future()
 
         app = QApplication.instance()
+        setattr(app,"my_is_closed",False)
         if hasattr(app, "aboutToQuit"):
             getattr(app, "aboutToQuit").connect(
-                functools.partial(close_future, future, loop)
+                functools.partial(close_future, future, loop,app)
             )
 
         mainWindow = MainWindow()
@@ -84,41 +90,27 @@ def runMainWindow():
 
 
 def runPlayerWindow(srContext:SRContext):
-    # async def run():
-    #     logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.DEBUG, force=True) # DEBUG
-    #     # media_info = MediaInfo([vurl],[vurl],"network")
-    #     # media_info=MediaInfo(["assets\\5s.mkv", "assets\\5s.mkv"],["assets\\5s.mkv", "assets\\5s.mkv"],"file")
-    #     # media_info = MediaInfo([r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],[r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],"file")
-    #     media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
-    #     # srContext = args
-    #     app = QApplication(sys.argv)
-    #     # player = BasePlayer()
-    #     player = PlayerWindow(srContext=srContext)
-    #     player.show()
-    #     player.play(media_info)
-    #     # player.play(media_info)
-    #     # sleep(10)
-    #     # print("asdfgasdfgsdf")
-    #     # window = Window()
-    #     # window.show()
-    #     sys.exit(app.exec_())
-
     async def run(srContext):
         
         media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
 
-        def close_future(future, loop):
+        def close_future(future, loop,app):
+            if app.my_is_closed:
+                return
+            else:
+                app.my_is_closed = True
+            print("close PlayerWindow")
             loop.call_later(10, future.cancel)
             future.cancel()
-
         loop = asyncio.get_event_loop()
         future = asyncio.Future()
         # logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.DEBUG, force=True) # DEBUG
         
         app = QApplication.instance()
+        setattr(app,"my_is_closed",False)
         if hasattr(app, "aboutToQuit"):
             getattr(app, "aboutToQuit").connect(
-                functools.partial(close_future, future, loop)
+                functools.partial(close_future, future, loop,app)
             )
             
         player = PlayerWindow(srContext=srContext)

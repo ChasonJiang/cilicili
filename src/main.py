@@ -14,11 +14,11 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from CiliCili.MainWindow import MainWindow
-from SuperResolution.SRContext import SRContext
-from SuperResolution.SuperResolutionHandler import SuperResolutionHandler
-from player.PlayerWindow import PlayerWindow
-from player.utils.MediaInfo import MediaInfo
-from player.CiliCiliPlayer import CiliCiliPlayer
+from VideoProcessor.SRContext import SRContext
+from VideoProcessor.VideoProcessorHandler import VideoProcessorHandler
+from Player.PlayerWindow import PlayerWindow
+from Player.Utils.MediaInfo import MediaInfo
+from Player.CiliCiliPlayer import CiliCiliPlayer
 logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.ERROR) # DEBUG
 
 # def RTSR(srh_srContext):
@@ -141,7 +141,7 @@ def start():
     playerWindow=Process(target=runPlayerWindow,args=[app_srContext])
     mainWindow = Process(target=runMainWindow)
     # rtsr = Process(target=RTSR,)
-    rtsr = SuperResolutionHandler(srh_srContext)
+    rtsr = VideoProcessorHandler(srh_srContext)
     # rtsr=Process(target=RTSR,args=[srh_srContext])
     rtsr.start()
     playerWindow.start()

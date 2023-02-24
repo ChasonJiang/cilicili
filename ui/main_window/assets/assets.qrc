@@ -5,6 +5,7 @@
     <file>window_op_icon/min.svg</file>
   </qresource>
   <qresource prefix="main_window">
+    <file>main_window_icon/sr_button.svg</file>
     <file>main_window_icon/back.svg</file>
     <file>main_window_icon/search.svg</file>
     <file>main_window_icon/home.svg</file>

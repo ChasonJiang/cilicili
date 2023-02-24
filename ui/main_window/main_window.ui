@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1600</width>
-    <height>900</height>
+    <height>1000</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -393,13 +393,13 @@ border-radius: 3px;
            <property name="minimumSize">
             <size>
              <width>34</width>
-             <height>100</height>
+             <height>200</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>34</width>
-             <height>100</height>
+             <height>200</height>
             </size>
            </property>
            <property name="layoutDirection">
@@ -407,7 +407,7 @@ border-radius: 3px;
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <property name="spacing">
-             <number>0</number>
+             <number>25</number>
             </property>
             <property name="leftMargin">
              <number>2</number>
@@ -425,6 +425,62 @@ border-radius: 3px;
              <widget class="QLabel" name="Avatar">
               <property name="text">
                <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="OfflineSuperReslutionButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#OfflineSuperReslutionButton {
+image: url(:/main_window/main_window_icon/sr_button.svg);
+background-color: rgba(0, 0, 0, 0);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}
+
+#OfflineSuperReslutionButton:hover{
+image: url(:/main_window/main_window_icon/sr_button.svg);
+background-color: rgb(230, 230, 230);
+padding: 3px,3px;
+border:0;
+margin:0;
+border-radius: 3px;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -966,7 +1022,7 @@ background-color:rgba(0,0,0,0);
                  <x>0</x>
                  <y>0</y>
                  <width>1534</width>
-                 <height>830</height>
+                 <height>930</height>
                 </rect>
                </property>
                <property name="sizePolicy">

@@ -6,17 +6,16 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from .utils.MediaInfo import MediaInfo
-from SuperResolution.HandlerCmd import HandlerCmd
-from SuperResolution.SRContext import SRContext
+from .Utils.MediaInfo import MediaInfo
+from VideoProcessor.HandlerCmd import HandlerCmd
+from VideoProcessor.SRContext import SRContext
 
-from player.PlayerControlLayer import PlayerControlLayer
+from .Layer.PlayerControlLayer import PlayerControlLayer
 
-from .utils.AudioDevice import AudioDevice
-from .utils.DisplayDevice import DisplayDevice
-from .DisplayLayer import DisplayLayer
-from .utils.PlayWorker import PlayWorker
-from .ui.PlayerAssets import *
+from .Device.AudioDevice import AudioDevice
+from .Device.DisplayDevice import DisplayDevice
+from .Worker.PlayWorker import PlayWorker
+from .Ui.PlayerAssets import *
 # import pycuda.driver
 # import pycuda.autoinit
 

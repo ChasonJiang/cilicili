@@ -17,6 +17,7 @@ from .ui.MainWindow_UI import Ui_MainWindow
 import qasync
 from qasync import QThreadExecutor, asyncSlot, asyncClose,QEventLoop
 from PyQt5.QtRemoteObjects import QRemoteObjectHost
+from OfflineSuperResolution.run import run as RunOSR
 LOGGER=logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 
@@ -71,6 +72,7 @@ class MainWindow(QWidget,Ui_MainWindow):
             finally:
                 self.switchPage(self.pageList[index],recode=True)
         self.BackButton.clicked.connect(func)
+        self.OfflineSuperReslutionButton.clicked.connect(RunOSR)
         LOGGER.debug("RemoteObjects inited")
 
     def initSearchContext(self):

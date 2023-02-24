@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1600, 900)
+        MainWindow.resize(1600, 1000)
         MainWindow.setStyleSheet("#MainWindow {\n"
 "background: rgba(255,255,255,0);\n"
 "margin:0;\n"
@@ -186,18 +186,49 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
         self.widget.setSizePolicy(sizePolicy)
-        self.widget.setMinimumSize(QtCore.QSize(34, 100))
-        self.widget.setMaximumSize(QtCore.QSize(34, 100))
+        self.widget.setMinimumSize(QtCore.QSize(34, 200))
+        self.widget.setMaximumSize(QtCore.QSize(34, 200))
         self.widget.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.widget.setObjectName("widget")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.widget)
         self.verticalLayout_3.setContentsMargins(2, 0, 2, 0)
-        self.verticalLayout_3.setSpacing(0)
+        self.verticalLayout_3.setSpacing(25)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.Avatar = QtWidgets.QLabel(self.widget)
         self.Avatar.setText("")
         self.Avatar.setObjectName("Avatar")
         self.verticalLayout_3.addWidget(self.Avatar)
+        self.OfflineSuperReslutionButton = QtWidgets.QPushButton(self.widget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.OfflineSuperReslutionButton.sizePolicy().hasHeightForWidth())
+        self.OfflineSuperReslutionButton.setSizePolicy(sizePolicy)
+        self.OfflineSuperReslutionButton.setMinimumSize(QtCore.QSize(30, 30))
+        self.OfflineSuperReslutionButton.setMaximumSize(QtCore.QSize(30, 30))
+        self.OfflineSuperReslutionButton.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.OfflineSuperReslutionButton.setStyleSheet("#OfflineSuperReslutionButton {\n"
+"image: url(:/main_window/main_window_icon/sr_button.svg);\n"
+"background-color: rgba(0, 0, 0, 0);\n"
+"padding: 3px,3px;\n"
+"border:0;\n"
+"margin:0;\n"
+"border-radius: 3px;\n"
+"}\n"
+"\n"
+"#OfflineSuperReslutionButton:hover{\n"
+"image: url(:/main_window/main_window_icon/sr_button.svg);\n"
+"background-color: rgb(230, 230, 230);\n"
+"padding: 3px,3px;\n"
+"border:0;\n"
+"margin:0;\n"
+"border-radius: 3px;\n"
+"}")
+        self.OfflineSuperReslutionButton.setText("")
+        self.OfflineSuperReslutionButton.setIconSize(QtCore.QSize(30, 30))
+        self.OfflineSuperReslutionButton.setFlat(False)
+        self.OfflineSuperReslutionButton.setObjectName("OfflineSuperReslutionButton")
+        self.verticalLayout_3.addWidget(self.OfflineSuperReslutionButton)
         self.SettingButton = QtWidgets.QPushButton(self.widget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -455,7 +486,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaContents = QtWidgets.QWidget()
-        self.scrollAreaContents.setGeometry(QtCore.QRect(0, 0, 1534, 830))
+        self.scrollAreaContents.setGeometry(QtCore.QRect(0, 0, 1534, 930))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

@@ -1,4 +1,6 @@
+import json
 import logging
+import os
 from queue import Queue
 import sys
 from PyQt5.QtCore import *
@@ -8,11 +10,12 @@ from qasync import asyncSlot
 from CiliCili.VideoInfo.EpisodeInfo import EpisodeInfo
 
 from CiliCili.VideoInfo.VideoInfo import VideoInfo
+from VideoProcessor.HandlerCmd import HandlerCmd
 
 from .CiliCiliPlayer import CiliCiliPlayer
-from .utils.MediaInfo import MediaInfo
-from SuperResolution.SRContext import SRContext
-from .ui.PlayerWindow_UI import Ui_PlayerWindow
+from .Utils.MediaInfo import MediaInfo
+from VideoProcessor.SRContext import SRContext
+from .Ui.PlayerWindow_UI import Ui_PlayerWindow
 from PyQt5.QtRemoteObjects import QRemoteObjectNode
 # logging.basicConfig(format='%(asctime)s - %(levelname)s : %(message)s', level=logging.DEBUG) # DEBUG
 LOGGER=logging.getLogger(__name__)
@@ -43,6 +46,11 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
         self.currentMediaInfoDict = None
 
         self.currentPlayType = None
+
+        self.inferencerName = None
+        self.multiplier = 1
+        self.loadInferencerInfo()
+        self.srContext.cmdPipe.send(HandlerCmd(HandlerCmd.LoadInferencer, self.inferencerName))
 
         self.initMoveAndResize()
 
@@ -89,6 +97,24 @@ class PlayerWindow(QWidget,Ui_PlayerWindow):
     def closeEvent(self, e: QCloseEvent) -> None:
         self.CiliCiliPlayer.close()
         return super().closeEvent(e)
+    
+    def loadInferencerInfo(self):
+        # print("Load Inferencer Info")
+        try:
+            with open(os.path.join(os.path.dirname(os.path.dirname(__file__)),"SuperResolutionInferencer","SuperResolutionInferencerRegister.json"),"r") as f:
+            # with open(os.path.join(os.path.dirname(__file__),"SuperResolutionInferencer","SuperResolutionInferencerRegister.json"),"r") as f:
+                self.inferencerInfo = json.loads(f.read())
+
+            self.inferencerName = self.inferencerInfo["Default"]
+            multiplier=self.inferencerInfo["Inferencer"][self.inferencerName]["Multiplier"]
+            assert multiplier != 0
+            self.multiplier = multiplier
+
+            LOGGER.debug("Inferencer Info loaded")
+        except IOError:
+            # print("Error reading SuperResolutionInferencerRegister.json")
+            LOGGER.error("Error reading SuperResolutionInferencerRegister.json")
+            raise RuntimeError("Load InferencerInfo Failed")
 
     @asyncSlot(dict)
     async def toShow(self,params:dict):

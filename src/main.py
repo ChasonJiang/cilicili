@@ -76,6 +76,7 @@ def runMainWindow():
             )
 
         mainWindow = MainWindow()
+        mainWindow.refresh()
         mainWindow.show()
 
         await future

@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 #     def process(self, frame):
 #         pass
 
-class Inferencer(QObject):
+class Inferencer():
     
-    def process(self, frame_buffer_queue:Queue):
+    def process(self, frame_buffer_queue:Queue)->list:
         pass

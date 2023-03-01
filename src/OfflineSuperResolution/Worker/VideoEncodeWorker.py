@@ -94,6 +94,7 @@ class VideoEncodeWorker(QObject):
                 # print("receiving frame")
                 start_time = perf_counter()
                 frame:torch.Tensor=self.sr_context.inputDataPipe.recv()
+                # print("received")
                 if frame is None:
                     self.encoder.stdin.close()
                     # self.encode_end_signal.emit()
@@ -111,6 +112,7 @@ class VideoEncodeWorker(QObject):
 
         except Exception as e:
             LOGGER.error(e)
+            self.send_log_signal.emit("Abnormal exit")
         finally:
             self.sr_context.cmdPipe.send(HandlerCmd(HandlerCmd.QuitSRWorker))
             self.clear_pipe()
@@ -135,6 +137,8 @@ class VideoEncodeWorker(QObject):
             raise RuntimeError("SRSC.LoadInferencer ")
         elif statusCode == SRSC.LoadInferencerInfoFailed:
             raise RuntimeError("SRSC.LoadInferencerInfoFailed")
+        elif statusCode == SRSC.SRException:
+            raise RuntimeError("SRSC.SRException")
         
     def clear_pipe(self):
         LOGGER.debug("clear pipe...")

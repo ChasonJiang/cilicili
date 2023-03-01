@@ -2,6 +2,7 @@ import logging
 from PyQt5.QtCore import *
 from threading import Thread
 from .SRContext import SRContext
+from .SRStatusCode import SRStatusCode
 from multiprocessing import Queue
 from .Inferencer import Inferencer
 
@@ -24,7 +25,15 @@ class SRWorker(Thread):
         while True:
             if self._isQuit:
                 break
-            frames = self.inferencer.process(self.frame_buffer_queue)
+            try:
+                frames = self.inferencer.process(self.frame_buffer_queue)
+            except Exception as e:
+                LOGGER.debug("Inferencer except")
+                print(e)
+                self.sr_context.msgPipe.send(SRStatusCode.SRException)
+                # self.sr_context.outputDataPipe.send(None)
+                break
+
 
             if frames is None:
                 LOGGER.debug("SRWorker process over")
@@ -32,5 +41,6 @@ class SRWorker(Thread):
                 break
 
             for frame in frames:
+                # print("send")
                 self.sr_context.outputDataPipe.send(frame)
         LOGGER.debug("SRWorker quited")

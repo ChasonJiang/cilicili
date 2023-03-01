@@ -33,7 +33,6 @@ class VideoProcessorHandler(Process):
         self.srContext = srContext
         self.srThread = None
         self.srWorker = None
-        self.eventLoop = None
         self.videoDecoder = None
         self.inferencerInfo = None
         self.inferencer = None

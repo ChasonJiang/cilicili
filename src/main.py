@@ -1,6 +1,7 @@
 
 # from multiprocessing import Process
 # from multiprocessing import Pipe
+import os
 import asyncio
 import functools
 import qasync
@@ -19,8 +20,13 @@ from VideoProcessor.VideoProcessorHandler import VideoProcessorHandler
 from Player.PlayerWindow import PlayerWindow
 from Player.Utils.MediaInfo import MediaInfo
 from Player.CiliCiliPlayer import CiliCiliPlayer
+
 logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.ERROR) # DEBUG
 
+
+def setEnv(path:str):
+    os.environ["Path"] = os.environ["Path"] + ";"+path
+setEnv("./bin")
 # def RTSR(srh_srContext):
 
 #     srh=SuperResolutionHandler(srh_srContext)

@@ -76,19 +76,7 @@ class DisplayDevice(QOpenGLWidget):
 
         self.enable_setup = True
 
-        # self.readimg()
-
         self.setupUi()
-
-    def readimg(self):
-        img = cv2.imread("C:\\Users\\White\\Project\\rtsr_client_pyqt\\assets\\1080.png")
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        frame_buffer = torch.from_numpy(img).type(torch.uint8)
-        ones = torch.ones((frame_buffer.shape[0],frame_buffer.shape[1],1), dtype=torch.uint8)
-        frame_buffer = torch.cat([frame_buffer,ones], dim=2)
-        # self.frame_buffer:torch.Tensor = torch.ones((512,512,4),dtype=torch.uint8)
-        self.frame_buffer = frame_buffer.cuda()
-        torch.cuda.synchronize()
 
     def setupUi(self,):
         # 隐藏窗口边框
@@ -105,14 +93,6 @@ class DisplayDevice(QOpenGLWidget):
     def playOnCpu(self):
         self.is_cuda = False
 
-    # def initializeGL(self):
-        # if self.is_cuda and self.tex_size is not None:
-        #     self.setup(self.tex_size)
-        # self.ctx = QOpenGLContext(self.parent())
-        # self.ctx.makeCurrent(self.ctx.surface())
-        # self.ctx = self.context()
-        # print(f"self.context: {self.context()} \nself.ctx: {self.ctx}")
-        
 
     def setup(self, tex_size:list):
         """
@@ -247,22 +227,6 @@ class DisplayDevice(QOpenGLWidget):
             cpy.height = h
             cpy(aligned=False) # must on cuda
             torch.cuda.synchronize()
-
-    # def mapping_frame(self, frame:torch.Tensor):
-    #     h,_ = self.tex.shape[:2]
-    #     # copy from torch into buffer
-    #     assert self.tex.nbytes == frame.numel()*frame.element_size()
-
-    #     cpy = pycuda.driver.Memcpy2D()
-    #     cpy.set_src_device(frame.data_ptr())
-    #     mapping = self.cuda_buffer.map()
-    #     ary= mapping.array(0,0)
-    #     cpy.set_dst_array(ary)
-    #     mapping.unmap()
-    #     cpy.width_in_bytes = cpy.src_pitch = cpy.dst_pitch = self.tex.nbytes//h
-    #     cpy.height = h
-    #     cpy(aligned=False) # must on cuda
-    #     torch.cuda.synchronize()
         
 
     def update(self, frame):

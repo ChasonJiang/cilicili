@@ -66,13 +66,18 @@ class VideoInfo():
         pubdate = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
         num_views = info["stat"]["view"]
         num_like = info["stat"]["like"]
-        desc_v2 = info["desc_v2"][0]
         desc = ""
-        if desc_v2["type"] == 1:
-            desc = desc_v2["raw_text"]
+        if "desc_v2" in info_keys :
+            # print()
+            if info["desc_v2"] is not None:
+                desc_v2 = info["desc_v2"][0]
+                if desc_v2["type"] == 1:
+                    desc = desc_v2["raw_text"]
+                else:
+                    desc = desc_v2["raw_text"] + "  @"+str(desc_v2["biz_id"])
         else:
-            desc = desc_v2["raw_text"] + "  @"+str(desc_v2["biz_id"])
-
+            # print(info["desc"])
+            desc = info["desc"]
         self.info = {
             "type":"video",
             "title":info["title"],

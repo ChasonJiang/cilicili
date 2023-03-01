@@ -15,4 +15,5 @@ class SRStatusCode(Enum):
     LoadInferencerInfoFailed = 9
     ProcessException = 10
     InferredLoaded = 11
+    SRException = 12
 

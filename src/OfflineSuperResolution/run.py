@@ -1,3 +1,4 @@
+import os
 import sys
 from torch.multiprocessing import Process
 from torch.multiprocessing import Pipe
@@ -14,7 +15,8 @@ from OfflineSuperResolution.OfflineSuperResolutionWindow import OfflineSuperReso
 
 # logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.ERROR) # DEBUG
 
-
+def setEnv(path:str):
+    os.environ["Path"] = os.environ["Path"] + ";"+path
 
 
 def runOfflineSuperResolution(srContext:SRContext):
@@ -25,6 +27,7 @@ def runOfflineSuperResolution(srContext:SRContext):
 
 
 def run():
+    setEnv("./bin")
     torch.multiprocessing.set_start_method('spawn', force=True)
     inCmdPipe,outCmdPipe = Pipe(True)
     inMsgPipe,outMsgPipe = Pipe(True)

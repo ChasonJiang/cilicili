@@ -25,8 +25,6 @@ class VideoDecoder(Thread):
         self.base_pts:int = decoderContext["base_pts"] # ms, int
         self.sr_mode:bool = decoderContext["sr_mode"]
 
-        self.device = torch.device("cuda:0")
-
     def quit(self):
         self._isQuit = True
 

@@ -5,6 +5,7 @@ import time
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import numpy as np
 import torch
 from ..Utils.PlayClock import PlayClock
 from ..Layer.DisplayLayer import DisplayLayer
@@ -22,6 +23,7 @@ class VideoPlayWorker(QObject):
     quit_signal = pyqtSignal(bool)
     set_frame_rate = pyqtSignal(int)
     update_buffer_queue = pyqtSignal(Queue)
+
     
     def __init__(self,display_device, buffer_queue, play_clock):
         super(VideoPlayWorker, self).__init__()
@@ -97,6 +99,10 @@ class VideoPlayWorker(QObject):
         # print("thread id of VideoPlayWorker is {}".format(QThread.currentThreadId()))
         is_block = False
         LOGGER.debug("video play started")
+        self.display_device.clear_screen_signal.emit()
+        # self.display_device.clear_screen_signal.emit()
+        # self.display_device.clear_screen_signal.emit()
+        # self.display_device.clear_screen_signal.emit()
         while True:
             if self._isQuit and self.buffer_queue.empty():
                 break

@@ -17,6 +17,7 @@ LOGGER.setLevel(logging.DEBUG)
 
 class AudioDecodeWorker(QObject):
     buffer_queue_full_signal = pyqtSignal(str)
+    buffer_queue_empty_signal = pyqtSignal()
     decoder_init_status_signal = pyqtSignal(int)
     req_clear_buffer_queue_signal = pyqtSignal()
     decode_end_signal = pyqtSignal()
@@ -39,6 +40,8 @@ class AudioDecodeWorker(QObject):
         self.frame_size = round(2*self.sample_rate*16*(1.0/self.frame_rate)/8)
         self.name = "AudioDecodeWorker"
         self.process = None
+        self.before_empty=False
+        self.buffer_queue_empty_signal.connect(self.change_before_empty)
 
     def quit(self):
         self._isQuit = True
@@ -69,9 +72,10 @@ class AudioDecodeWorker(QObject):
                     # LOGGER.info("AudioDecodeWorker quit")
                     break 
 
-                if self.buffer_queue.full():
-                    # LOGGER.debug("audio frame buffer queue is full")
+                if self.buffer_queue.full() and self.before_empty:
+                    LOGGER.debug("audio frame buffer queue is full")
                     self.buffer_queue_full_signal.emit("audio_decode_worker")
+                    self.before_empty =False
                 # 计算音频每帧的字节数 channel * sample_rate * seconds_per_frame / 8 
 
                 frame_bytes=self.decoder.stdout.read(self.frame_size)
@@ -87,7 +91,7 @@ class AudioDecodeWorker(QObject):
                     # sleep(2)
                     # continue
         
-                zero_byte_counter = 0
+                # zero_byte_counter = 0
 
                 frame = (
                     np
@@ -112,6 +116,10 @@ class AudioDecodeWorker(QObject):
             LOGGER.info("AudioDecodeWorker quited")
             
         LOGGER.debug("total audio frames {}".format(curr_frame_index+1))
+
+    def change_before_empty(self):
+        print("change_before_empty")
+        self.before_empty = True
         
     def init_decoder(self,audio_context:AudioContext, ss:int=0):
         decoder = None

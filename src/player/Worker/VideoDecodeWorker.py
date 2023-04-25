@@ -20,6 +20,7 @@ LOGGER.setLevel(logging.DEBUG)
 
 class VideoDecodeWorker(QObject):
     buffer_queue_full_signal = pyqtSignal(str)
+    buffer_queue_empty_signal = pyqtSignal()
     decoder_init_status_signal = pyqtSignal(int)
     req_clear_buffer_queue_signal = pyqtSignal()
     decode_end_signal = pyqtSignal()
@@ -38,6 +39,8 @@ class VideoDecodeWorker(QObject):
         self.video_context=video_context
         self.ss = ss # ms, int
         self.base_pts = base_pts # ms, int
+        self.before_empty=False
+        self.buffer_queue_empty_signal.connect(self.change_before_empty)
 
 
     def quit(self):
@@ -70,12 +73,15 @@ class VideoDecodeWorker(QObject):
                     break 
                 if self.sr_context.msgPipe.poll():
                     self.checkSrMsg(self.sr_context.msgPipe.recv())
-                if self.buffer_queue.full():
-                    # LOGGER.debug("video frame buffer queue is full")
+                if self.buffer_queue.full() and self.before_empty:
+                    LOGGER.debug("video frame buffer queue is full")
                     self.buffer_queue_full_signal.emit("video_decode_worker")
+                    self.before_empty=False
+                # if not self.sr_context.inputDataPipe.poll() and self.buffer_queue.empty():
+                #     self.before_empty=True
                 
                 frame=self.sr_context.inputDataPipe.recv()
-                # print(frame)
+                # print("frame")
                 # LOGGER.debug("read video frame")
                 if frame is None:
                     self.decode_end_signal.emit()
@@ -94,6 +100,11 @@ class VideoDecodeWorker(QObject):
             LOGGER.info("VideoDecodeWorker quited")
 
         LOGGER.debug("total video frames {}".format(curr_frame_index+1))
+
+
+    def change_before_empty(self,):
+        print("change_before_empty")
+        self.before_empty=True
 
 
     def checkSrMsg(self,statusCode:int):

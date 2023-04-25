@@ -1,14 +1,14 @@
 {
-    "Default":"IMDN",
+    "Default":"IMDN-AVC",
     "Inferencer":{
-        "FSRCNN":{
-            "ClassName":"FSRCNN",
-            "ClassPath":"FSRCNN.FSRCNN",
-            "Multiplier":4
-        },
-        "IMDN":{
+        "IMDN-REDS":{
             "ClassName":"IMDN",
-            "ClassPath":"IMDN.IMDN",
+            "ClassPath":"IMDN-REDS.IMDN",
+            "Multiplier":2
+        },
+        "IMDN-AVC":{
+            "ClassName":"IMDN",
+            "ClassPath":"IMDN-AVC.IMDN",
             "Multiplier":2
         }
     }

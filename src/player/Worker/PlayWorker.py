@@ -26,6 +26,7 @@ class PlayWorker(QObject):
     play_resume_signal = pyqtSignal()
     play_end_signal = pyqtSignal()
     play_seek_signal = pyqtSignal(int)
+    play_state_reset = pyqtSignal()
     update_playback_progress = pyqtSignal(int)
     get_AVContext_failed = pyqtSignal(str)
     wait_buffer_signal = pyqtSignal()
@@ -50,8 +51,8 @@ class PlayWorker(QObject):
         self.play_signal.connect(self.play)
         self.play_locker = QMutex()
         self.play_wait_buffer_locker = QMutex()
-        self.play_pause_signal.connect(self.pause)
-        self.play_resume_signal.connect(self.resume)
+        self.play_pause_signal.connect(self.play_pause)
+        self.play_resume_signal.connect(self.play_resume)
 
 
     def init(self,mediaInfo:MediaInfo):
@@ -104,6 +105,8 @@ class PlayWorker(QObject):
         self.exceptionStatus = False
 
         self.inited = True
+
+        self.pause_locked =False
 
     def play(self, mediaInfo:MediaInfo):
         # print("play is {}".format(QThread.currentThreadId()))  
@@ -273,6 +276,7 @@ class PlayWorker(QObject):
         self.videoDecodeThread = QThread()
         self.videoDecodeWorker = VideoDecodeWorker(vContext, self.videoFrameBufferQueue, ss,base_pts,sr_mode,sr_context)
         self.videoDecodeWorker.moveToThread(self.videoDecodeThread)
+        self.videoPlayWorker.wait_buffer_signal.connect(self.v_buffer_empty)
         # self.videoDecodeWorker.buffer_queue_full_signal.connect(self.videoStatusNeuron.inTwo)
         self.videoDecodeWorker.buffer_queue_full_signal.connect(self.playStatusController.video_buffer_full_slot)
         self.videoDecodeThread.started.connect(self.videoDecodeWorker.work)
@@ -282,10 +286,19 @@ class PlayWorker(QObject):
         self.audioDecodeThread = QThread() 
         self.audioDecodeWorker = AudioDecodeWorker(aContext,self.audioFrameBufferQueue,ss,base_pts)
         self.audioDecodeWorker.moveToThread(self.audioDecodeThread)
+        self.audioPlayWorker.wait_buffer_signal.connect(self.a_buffer_empty)
         # self.audioDecodeWorker.buffer_queue_full_signal.connect(self.audioStatusNeuron.inTwo)
         self.audioDecodeWorker.buffer_queue_full_signal.connect(self.playStatusController.audio_buffer_full_slot)
         self.audioDecodeWorker.decode_end_signal.connect(self.decode_next_slice)
         self.audioDecodeThread.started.connect(self.audioDecodeWorker.work)
+
+    def a_buffer_empty(self,):
+        if self.audioDecodeWorker is not None:
+            self.audioDecodeWorker.buffer_queue_empty_signal.emit()
+
+    def v_buffer_empty(self,):
+        if self.videoDecodeWorker is not None:
+            self.videoDecodeWorker.buffer_queue_empty_signal.emit()
 
     def play_wait_buffer_slot(self,status:bool):
         self.play_wait_buffer_locker.lock()
@@ -368,6 +381,8 @@ class PlayWorker(QObject):
             # self.playStatus = True
         if not self.playEndStatus:
             LOGGER.debug("play resume")
+            if self.pause_locked:
+                return 
             if self.videoPlayWorker is not None:
                 self.videoPlayWorker.resume_signal.emit()
             if self.audioPlayWorker is not None:
@@ -383,7 +398,16 @@ class PlayWorker(QObject):
             if self.videoPlayWorker is not None:
                 self.videoPlayWorker.pause_signal.emit()
 
+    def play_resume(self):
+        self.pause_locked=False
+        self.resume()
+
+    def play_pause(self,):
+        self.pause_locked=True
+        self.pause()
+
     def seek(self,ss:int,):
+        self.play_state_reset.emit()
         LOGGER.debug(f"seek to {ss}")
         # self.wait_buffer_signal.emit()
         self.quit_timer()
@@ -486,6 +510,7 @@ class PlayWorker(QObject):
 
     def quit_avplay_worker(self,force:bool=False):
         if self.videoPlayWorker is not None:
+            self.videoPlayWorker.wait_buffer_signal.disconnect(self.v_buffer_empty)
             # LOGGER.debug("quit video play worker")
             if True:
                 self.videoPlayWorker.forcedQuit()
@@ -495,10 +520,12 @@ class PlayWorker(QObject):
 
         if self.audioPlayWorker is not None:
             # LOGGER.debug("quit audio play worker")
+            self.audioPlayWorker.wait_buffer_signal.disconnect(self.a_buffer_empty)
             if force:
                 self.audioPlayWorker.forcedQuit()
             else:
                 self.audioPlayWorker.quit()
+
             self.audioPlayWorker = None
 
 

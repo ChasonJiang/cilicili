@@ -19,6 +19,7 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     set_duration_time = pyqtSignal(int)
     seek_to = pyqtSignal(int)
     switch_sr_mode = pyqtSignal(bool)
+    reset_play_state = pyqtSignal()
 
     def __init__(self,parent=None):
         super(PlayerControlLayer, self).__init__(parent)
@@ -47,6 +48,7 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
         self.isShow = False
         self.playButton.setCheckable(True)
         self.playButton.clicked[bool].connect(self.switchPlayState)
+        self.reset_play_state.connect(self.playStateReset)
         self.playState = True
         self.fullScreenButton.setCheckable(True)
         self.fullScreenButton.clicked[bool].connect(self.switchFullScreen)
@@ -85,6 +87,10 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     def switchPlayState(self,state:bool):
         self.playState = not state
         self.switch_play_state.emit(self.playState)
+
+    def playStateReset(self):
+        self.playState =True
+        self.playButton.setChecked(False)
 
     def switchSRMode(self,state:bool):
         self.switch_sr_mode.emit(state)
@@ -129,10 +135,10 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
             self.fullScreenButton.setChecked(False)
             self.switchFullScreen(False)
 
-    def mousePressEvent(self,event):
-        self.playButton.setChecked(not self.playButton.isChecked())
-        self.switchPlayState(self.playState)
-        return super().mousePressEvent(event)
+    # def mousePressEvent(self,event):
+    #     self.playButton.setChecked(not self.playButton.isChecked())
+    #     self.switchPlayState(self.playState)
+    #     return super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         self.to_show.emit(2000)

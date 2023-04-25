@@ -64,6 +64,7 @@ class CiliCiliPlayer(QWidget):
         self.playWorker.update_playback_progress.connect(self.playerControlLayer.updatePlayProgress)
         self.playerControlLayer.seek_to.connect(self.playWorker.seek)
         self.playerControlLayer.switch_sr_mode.connect(self.playWorker.switchSRMode)
+        self.playWorker.play_state_reset.connect(lambda:self.playerControlLayer.reset_play_state.emit())
         # self.playThread.started.connect(lambda:self.playWorker.play(media_info))
         self.playThread.start()
         # self.playStatus = True
@@ -72,6 +73,7 @@ class CiliCiliPlayer(QWidget):
         self.play_locker.lock()
         # self.playWorker.play_pause_signal.emit()
         # self.playWorker.shutdown_signal.emit(True)
+        self.playerControlLayer.reset_play_state.emit()
         self.playWorker.play_signal.emit(media_info)
         self.play_locker.unlock()
 

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import *
 
-class PlayStatusController(QObject):
+class PlayStatusController_v1(QObject):
     update_status = pyqtSignal(bool)
     def __init__(self,):
         super(PlayStatusController, self).__init__()
@@ -73,6 +73,70 @@ class PlayStatusController(QObject):
         self.video_wait = False
         self.audio_wait = False
         self.in_period = False
+
+    def send_ready(self):
+        # self.locker.lock()
+        self.update_status.emit(True)
+        self.reset()
+        # self.locker.unlock()
+
+    def send_not_ready(self):
+        # self.locker.lock()
+        self.update_status.emit(False)
+        # self.locker.unlock()
+
+
+
+
+class PlayStatusController(QObject):
+    update_status = pyqtSignal(bool)
+    def __init__(self,):
+        super(PlayStatusController, self).__init__()
+        self.locker = QMutex()
+        self.audio_wait = False
+        self.video_wait = False
+        # self.in_period = False
+
+
+    # 此函数将手动发起缓冲等待信号
+    def wait_buffer_mode(self,):
+        self.locker.lock()
+        self.audio_wait = True
+        self.video_wait = True
+        self.locker.unlock()
+
+
+    def audio_wait_buffer_slot(self):
+        self.locker.lock()
+        self.audio_wait = True
+        if not self.video_wait:
+            self.send_not_ready()
+        self.locker.unlock()
+
+    def audio_buffer_full_slot(self,):
+        self.locker.lock()
+        self.audio_wait = False
+        if not (self.audio_wait and self.video_wait):
+            self.send_ready()
+        self.locker.unlock()
+
+    def video_wait_buffer_slot(self):
+        self.locker.lock()
+        self.video_wait = True
+        if not self.audio_wait:
+            self.send_not_ready()
+        self.locker.unlock()
+
+    def video_buffer_full_slot(self,):
+        self.locker.lock()
+        self.video_wait = False
+        if not (self.audio_wait and self.video_wait):
+            self.send_ready()
+        self.locker.unlock()
+
+    def reset(self):
+        self.video_wait = False
+        self.audio_wait = False
 
     def send_ready(self):
         # self.locker.lock()

@@ -28,6 +28,7 @@ class DisplayDevice(QOpenGLWidget):
     setup_signal = pyqtSignal(list)
     update_signal_np = pyqtSignal(np.ndarray)
     update_signal_tensor = pyqtSignal(torch.Tensor)
+    clear_screen_signal = pyqtSignal()
 
     VERTEX_CODE="""
     uniform float scale;
@@ -56,6 +57,7 @@ class DisplayDevice(QOpenGLWidget):
         self.setup_signal.connect(self.setup)
         self.update_signal_np.connect(self.update)
         self.update_signal_tensor.connect(self.update)
+        self.clear_screen_signal.connect(self.clear_screen)
         self.tex_size=tex_size
         # self.setAutoBufferSwap(False)
         self.setMouseTracking(True)
@@ -110,7 +112,7 @@ class DisplayDevice(QOpenGLWidget):
         self.frame = self.frame.cuda()
         self.frame[:,:,3] = 1 # set alpha
         self.tex, self.cuda_buffer = self.create_shared_texture(tex_size[0], tex_size[1])
-        print(self.cuda_buffer)
+        # print(self.cuda_buffer)
         self.program = gloo.Program(vertex = self.VERTEX_CODE,
                                     fragment = self.FRAGMENT_CODE,
                                     count = 4
@@ -210,6 +212,30 @@ class DisplayDevice(QOpenGLWidget):
         """ Clear the whole window """
         gl.glClearColor(*(0,0,0,1))
         gl.glClear(16640)
+
+    def clear_screen(self):
+        if isinstance(self.frame,torch.Tensor):
+            # self.frame:np.ndarray = self.frame.cpu().numpy()
+            # shape = np.array(self.frame.shape)
+            # shape+=np.array([10,10,0])
+            self.frame = torch.zeros_like(self.frame)
+            self.update(self.frame)
+        else:
+            # shape = np.array(self.frame.shape)
+            self.frame = np.zeros_like(self.frame)
+            self.update(self.frame)
+        # self.painter.begin(self)
+        # v_x, v_y, v_w, v_h = self.getViewportSize()
+        # self.painter.setViewport(v_x, v_y, v_w, v_h)
+        # self.painter.end()
+        # self.makeCurrent()
+        # self.clear()
+        # self.update(np.zeros((4000,4000,4),dtype=np.uint8))
+        # self.update(np.zeros((2000,2000,4),dtype=np.uint8))
+        # self.update(np.zeros((2000,2000,4),dtype=np.uint8))
+        # self.update(np.zeros((2000,2000,4),dtype=np.uint8))
+
+        
 
 
     def mapping_frame(self, frame:torch.Tensor):

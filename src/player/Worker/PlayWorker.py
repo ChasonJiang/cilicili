@@ -204,6 +204,7 @@ class PlayWorker(QObject):
         # self.videoPlayWorker.wait_buffer_signal.connect(self.videoStatusNeuron.inOne)
         self.videoPlayWorker.wait_buffer_signal.connect(self.playStatusController.video_wait_buffer_slot)
         self.videoPlayWorker.quit_signal.connect(self.playEndStatusNeuron.inOne)
+        self.videoPlayWorker.wait_buffer_signal.connect(self.v_buffer_empty)
         self.videoPlayThread.started.connect(self.videoPlayWorker.play)
 
         self.audioPlayThread = QThread()
@@ -212,6 +213,7 @@ class PlayWorker(QObject):
         # self.audioPlayWorker.wait_buffer_signal.connect(self.audioStatusNeuron.inOne)
         self.audioPlayWorker.wait_buffer_signal.connect(self.playStatusController.audio_wait_buffer_slot)
         self.audioPlayWorker.quit_signal.connect(self.playEndStatusNeuron.inTwo)
+        self.audioPlayWorker.wait_buffer_signal.connect(self.a_buffer_empty)
         self.audioPlayThread.started.connect(self.audioPlayWorker.play)
 
         self.videoPlayThread.start()
@@ -276,7 +278,7 @@ class PlayWorker(QObject):
         self.videoDecodeThread = QThread()
         self.videoDecodeWorker = VideoDecodeWorker(vContext, self.videoFrameBufferQueue, ss,base_pts,sr_mode,sr_context)
         self.videoDecodeWorker.moveToThread(self.videoDecodeThread)
-        self.videoPlayWorker.wait_buffer_signal.connect(self.v_buffer_empty)
+        
         # self.videoDecodeWorker.buffer_queue_full_signal.connect(self.videoStatusNeuron.inTwo)
         self.videoDecodeWorker.buffer_queue_full_signal.connect(self.playStatusController.video_buffer_full_slot)
         self.videoDecodeThread.started.connect(self.videoDecodeWorker.work)
@@ -286,7 +288,7 @@ class PlayWorker(QObject):
         self.audioDecodeThread = QThread() 
         self.audioDecodeWorker = AudioDecodeWorker(aContext,self.audioFrameBufferQueue,ss,base_pts)
         self.audioDecodeWorker.moveToThread(self.audioDecodeThread)
-        self.audioPlayWorker.wait_buffer_signal.connect(self.a_buffer_empty)
+        
         # self.audioDecodeWorker.buffer_queue_full_signal.connect(self.audioStatusNeuron.inTwo)
         self.audioDecodeWorker.buffer_queue_full_signal.connect(self.playStatusController.audio_buffer_full_slot)
         self.audioDecodeWorker.decode_end_signal.connect(self.decode_next_slice)

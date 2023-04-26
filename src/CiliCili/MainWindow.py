@@ -61,8 +61,8 @@ class MainWindow(QWidget,Ui_MainWindow):
                 self.showMaximized()
         self.MaxButton.clicked.connect(showMax)
         self.SearchBox.returnPressed.connect(self.search)
-        self.SearchButton.clicked.connect(lambda :self.switchPage(self.searchPage))
-        self.HomeButton.clicked.connect(lambda :self.switchPage(self.homePage))
+        self.SearchButton.clicked.connect(lambda :(self.switchPage(self.searchPage),self.search()))
+        self.HomeButton.clicked.connect(lambda :(self.switchPage(self.homePage),self.refresh()))
         def func():
             index = 0
             try:
@@ -71,7 +71,7 @@ class MainWindow(QWidget,Ui_MainWindow):
                 pass
             finally:
                 self.switchPage(self.pageList[index],recode=True)
-        self.BackButton.clicked.connect(func)
+        # self.BackButton.clicked.connect(func)
         self.OfflineSuperReslutionButton.clicked.connect(RunOSR)
         LOGGER.debug("RemoteObjects inited")
 
@@ -121,8 +121,8 @@ class MainWindow(QWidget,Ui_MainWindow):
         self.pageFlowLayoutList = []
         for index in range(len(self.pageList)):
             self.pageIndexDict[self.pageList[index]]=index
-            self.stackLayout.insertWidget(index, self.pageList[index])
             self.pageFlowLayoutList.append(FlowLayout(self.pageList[index],30,20,30))
+            self.stackLayout.insertWidget(index, self.pageList[index])
 
         #记录用户选择page的index
         self.pageIndexStack = []

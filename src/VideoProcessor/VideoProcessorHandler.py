@@ -64,10 +64,12 @@ class VideoProcessorHandler(Process):
                     self.srWorker = SRWorker( self.frameBufferQueue, self.inferencer, self.srContext)
                     self.srWorker.setDaemon(True)
                     self.srWorker.start()
+                    LOGGER.debug("SRWorker started")
 
                 self.videoDecoder = VideoDecoder(decoderContext, self.srContext, self.frameBufferQueue if sr_mode else None)
                 self.videoDecoder.setDaemon(True)
                 self.videoDecoder.start()
+                LOGGER.debug("VideoDecoder started")
             elif handlerCmd.cmd == HandlerCmd.LoadInferencer:
                 LOGGER.debug("Loading inferencer...")
                 inferencerName:str = handlerCmd.args

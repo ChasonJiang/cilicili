@@ -56,6 +56,8 @@ class VideoPlayWorker(QObject):
         self.frame_timer = 0
         self.min_refresh_time = 8
 
+        self.frist_load=True
+
     def setFrameRate(self,frame_rate:int):
         self.curr_frame_rate = frame_rate
         self.delay_constant = 1000.0/self.curr_frame_rate
@@ -99,18 +101,22 @@ class VideoPlayWorker(QObject):
         # print("thread id of VideoPlayWorker is {}".format(QThread.currentThreadId()))
         is_block = False
         LOGGER.debug("video play started")
-        self.display_device.clear_screen_signal.emit()
+        # if not self.frist_load:
+        
         # self.display_device.clear_screen_signal.emit()
         # self.display_device.clear_screen_signal.emit()
         # self.display_device.clear_screen_signal.emit()
         while True:
+            self.frist_load=False
             if self._isQuit and self.buffer_queue.empty():
+                self.display_device.clear_screen_signal.emit()
                 break
             if self.forced_quit:
                 # 防止decoder因缓冲队满而阻塞,导致无法正常退出
                 if self.buffer_queue.full():
                     self.buffer_queue.get_nowait()
                     self.buffer_queue.get_nowait()
+                self.display_device.clear_screen_signal.emit()
                 break
 
             self.mutex.lock()
@@ -191,6 +197,8 @@ class VideoPlayWorker(QObject):
             self.frame_timer = time.perf_counter()*1000
 
             self.mutex.unlock()
+        
+        
 
         LOGGER.debug("The frame loss rate of this video is {:.2f} %".format((1.0*self.drop_frame_counter/(self.frame_counter+0.0001))*100))
         LOGGER.debug("VideoPlayWorker quited")

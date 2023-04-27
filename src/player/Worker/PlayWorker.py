@@ -129,8 +129,9 @@ class PlayWorker(QObject):
             #     self.init_rtstWorker()
             self.play_slice(self.curr_slice_index, 0,0, self.sr_mode,sr_context=self.srContext)
         except Exception as e:
-            LOGGER.error(e.with_traceback())
+            LOGGER.error(e)
             self.shutdown()
+            self.play_locker.unlock()
         finally:
             self.play_locker.unlock()
 
@@ -550,6 +551,7 @@ class PlayWorker(QObject):
         #     self.updatePlaybackProgressTimer.stop()
         if not self.inited:
             return
+        self.play_pause()
         self.quit_timer()
         self.quit_avplay_worker(force)
         self.quit_avdecode()

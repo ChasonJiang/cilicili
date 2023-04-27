@@ -1,5 +1,5 @@
 {
-    "Default":"IMDN-AVC",
+    "Default":"IMDN-REDS",
     "Inferencer":{
         "IMDN-REDS":{
             "ClassName":"IMDN",

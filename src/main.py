@@ -10,7 +10,7 @@ from torch.multiprocessing import Pipe
 import sys
 import logging
 import torch
-from time import sleep
+# from time import sleep
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -18,8 +18,8 @@ from CiliCili.MainWindow import MainWindow
 from VideoProcessor.SRContext import SRContext
 from VideoProcessor.VideoProcessorHandler import VideoProcessorHandler
 from Player.PlayerWindow import PlayerWindow
-from Player.Utils.MediaInfo import MediaInfo
-from Player.CiliCiliPlayer import CiliCiliPlayer
+# from Player.Utils.MediaInfo import MediaInfo
+# from Player.CiliCiliPlayer import CiliCiliPlayer
 
 logging.basicConfig(format='--> %(levelname)s : %(message)s', level=logging.ERROR) # DEBUG
 
@@ -45,13 +45,13 @@ def Application(args:list):
     # media_info = MediaInfo([vurl],[vurl],"network")
     # media_info=MediaInfo(["assets\\5s.mkv", "assets\\5s.mkv"],["assets\\5s.mkv", "assets\\5s.mkv"],"file")
     # media_info = MediaInfo([r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],[r"C:\Users\White\Project\rtsr_client_pyqt\assets\[Kamigami&Mabors] Saenai Heroine no Sodatekata Flat - 00 [1080p x265 Ma10p AAC].mkv"],"file")
-    media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
+    # media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
     srContext = args
     app = QApplication(sys.argv)
     # player = BasePlayer()
     player = PlayerWindow(srContext=srContext)
     player.show()
-    player.play(media_info)
+    # player.play(media_info)
     # player.play(media_info)
     # sleep(10)
     # print("asdfgasdfgsdf")
@@ -99,7 +99,7 @@ def runMainWindow():
 def runPlayerWindow(srContext:SRContext):
     async def run(srContext):
         
-        media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
+        # media_info = MediaInfo(["assets\\360p_all.mkv","assets\\360p_all.mkv"],["assets\\360p_all.mkv","assets\\360p_all.mkv"],"file")
 
         def close_future(future, loop,app):
             if app.my_is_closed:

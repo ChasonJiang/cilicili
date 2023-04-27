@@ -33,7 +33,7 @@ class IMDN(Inferencer):
         self.model.to(self.device)
         self.model.eval()
         self.ones = None
-        LOGGER.debug("IMDN_RTC initialized")
+        LOGGER.debug("IMDN-AVC initialized")
 
     def process(self, frame_buffer_queue):
         
@@ -50,8 +50,11 @@ class IMDN(Inferencer):
             # with amp.autocast(self.device.type):
             output = self.model(frame)
             output = torch.round(output.detach().squeeze()[ [2, 1, 0],:, :].clamp(0, 1) *255).permute(1,2,0).int()
-            if self.ones is None:
+            if self.ones is None :
                 self.ones = torch.ones((output.shape[0],output.shape[1],1), dtype=torch.uint8).cuda()
+            elif (self.ones.shape[0] != output.shape[0]) or (self.ones.shape[1] != output.shape[1]) or (self.ones.shape[2] != output.shape[2]):
+                self.ones = torch.ones((output.shape[0],output.shape[1],1), dtype=torch.uint8).cuda()
+
             output = torch.cat([output,self.ones ], dim=2)
             # print(f"frame time: {(time.perf_counter()-start_time)*1000} ms")
             output =  [output]

@@ -29,7 +29,7 @@ class SRWorker(Thread):
                 frames = self.inferencer.process(self.frame_buffer_queue)
             except Exception as e:
                 LOGGER.debug("Inferencer except")
-                print(e)
+                LOGGER.debug(e)
                 self.sr_context.msgPipe.send(SRStatusCode.SRException)
                 # self.sr_context.outputDataPipe.send(None)
                 break

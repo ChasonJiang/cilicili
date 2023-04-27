@@ -77,6 +77,7 @@ class DisplayDevice(QOpenGLWidget):
             self.frame = np.ones((1, 1,4), dtype=np.uint8)
 
         self.enable_setup = True
+        self.force_setup=False
 
         self.setupUi()
 
@@ -218,8 +219,11 @@ class DisplayDevice(QOpenGLWidget):
             # self.frame:np.ndarray = self.frame.cpu().numpy()
             # shape = np.array(self.frame.shape)
             # shape+=np.array([10,10,0])
+            # self.frame = torch.zeros_like(self.frame)
+            # self.force_setup=True
             self.frame = torch.zeros_like(self.frame)
             self.update(self.frame)
+            # self.force_setup=False
         else:
             # shape = np.array(self.frame.shape)
             self.frame = np.zeros_like(self.frame)
@@ -268,7 +272,9 @@ class DisplayDevice(QOpenGLWidget):
             if self.enable_setup:
                 self.enable_setup = False
                 self.is_cuda = True
-                if self.tex is not None:
+                if self.force_setup:
+                    self.setup([frame.shape[1],frame.shape[0]])
+                elif self.tex is not None:
                     if self.tex.shape[0] != frame.shape[1] or \
                         self.tex.shape[1] != frame.shape[0]:
                         self.setup([frame.shape[1],frame.shape[0]])

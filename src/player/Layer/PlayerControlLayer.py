@@ -18,7 +18,7 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     upadte_play_progress = pyqtSignal(int)
     set_duration_time = pyqtSignal(int)
     seek_to = pyqtSignal(int)
-    switch_sr_mode = pyqtSignal(bool)
+    switch_sr_mode = pyqtSignal()
     reset_play_state = pyqtSignal()
 
     def __init__(self,parent=None):
@@ -91,9 +91,13 @@ class PlayerControlLayer(QWidget,Ui_playerControlLayer):
     def playStateReset(self):
         self.playState =True
         self.playButton.setChecked(False)
+        # self.srmode = False
+        # self.superResolutionButton.setChecked(False)
 
     def switchSRMode(self,state:bool):
-        self.switch_sr_mode.emit(state)
+        # self.switch_sr_mode.emit(state)
+        # self.srmode = 
+        self.switch_sr_mode.emit()
 
 
     def updatePlayProgress(self,t:int):

@@ -27,6 +27,7 @@ class PlayWorker(QObject):
     play_end_signal = pyqtSignal()
     play_seek_signal = pyqtSignal(int)
     play_state_reset = pyqtSignal()
+    switch_sr_mode_signal = pyqtSignal(bool)
     update_playback_progress = pyqtSignal(int)
     get_AVContext_failed = pyqtSignal(str)
     wait_buffer_signal = pyqtSignal()
@@ -53,6 +54,7 @@ class PlayWorker(QObject):
         self.play_wait_buffer_locker = QMutex()
         self.play_pause_signal.connect(self.play_pause)
         self.play_resume_signal.connect(self.play_resume)
+        self.switch_sr_mode_signal.connect(self.switchSRMode)
 
 
     def init(self,mediaInfo:MediaInfo):
@@ -219,6 +221,7 @@ class PlayWorker(QObject):
 
         self.videoPlayThread.start()
         self.audioPlayThread.start()
+        # self.pause()
 
     def init_rtstWorker(self,srContext:SRContext):
         self.srFrameBufferQueue = Queue(self.vQueueSize)
@@ -247,8 +250,10 @@ class PlayWorker(QObject):
         self.updatePlaybackProgressTimer.timeout.connect(self.update_progress)
         self.updatePlaybackProgressTimerThread.started.connect(self.updatePlaybackProgressTimer.start)
         self.updatePlaybackProgressTimerThread.finished.connect(self.updatePlaybackProgressTimer.stop)
-        # self.resume()
         self.updatePlaybackProgressTimerThread.start()
+        # self.play_resume()
+        # if not self.playStatus:
+        #     self.resume()
         
 
 
@@ -381,9 +386,10 @@ class PlayWorker(QObject):
     def resume(self,):
         
         # if not self.playStatus and not self.playEndStatus:
-            # self.playStatus = True
+            # 
         if not self.playEndStatus:
             LOGGER.debug("play resume")
+            self.playStatus = True
             if self.pause_locked:
                 return 
             if self.videoPlayWorker is not None:
@@ -393,9 +399,10 @@ class PlayWorker(QObject):
 
     def pause(self,):
         # if self.playStatus and not self.playEndStatus:
-        #     self.playStatus = False
+        #     
         if not self.playEndStatus:
             LOGGER.debug("play pause")
+            self.playStatus = False
             if self.audioPlayWorker is not None:
                 self.audioPlayWorker.pause_signal.emit()
             if self.videoPlayWorker is not None:
@@ -435,6 +442,7 @@ class PlayWorker(QObject):
         self.play_slice(slice_index, ts, self.lastDurationTime,self.sr_mode,sr_context=self.srContext)
 
     def switchSRMode(self,state:bool):
+        LOGGER.debug(f"Super-Resolution State: {state}")
         if state:
             self.enableSR()
         else:
@@ -444,10 +452,14 @@ class PlayWorker(QObject):
         # assert self.srContext is not None
         self.sr_mode = True
         self.seek(self.play_clock.curr_ts)
-    
+        # if not self.playStatus:
+        #     self.resume()
+        
     def disableSR(self):
         self.sr_mode = False
         self.seek(self.play_clock.curr_ts)
+        # if not self.playStatus:
+        #     self.resume()
 
 
     def convert2slice_ts(self,ss:int):

@@ -12,6 +12,7 @@ from torch import amp
 from VideoProcessor.Inferencer import Inferencer
 import numpy as np
 from PyQt5.QtCore import *
+from VideoProcessor.Utils.bicubic import imresize
 LOGGER=logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 
@@ -45,19 +46,33 @@ class IMDN(Inferencer):
         if frame is not None:
             frame = frame.astype("uint8")[:, :, [2, 1, 0]]
             # print(frame.shape)
+            # H, W, C -> C, H, W
             frame = frame.transpose((2,0,1))/255.0
-            frame=torch.from_numpy(frame.astype('float32')).to(self.device).unsqueeze(0)
+            frame=torch.from_numpy(frame.astype('float32')).to(self.device)
+            # frame = frame.unsqueeze(0)
+            frame_left,frame_right,is_left_and_right=self.frame_split(frame)
+            frame_right = frame_right.unsqueeze(0)
+            # frame_left_scaled = (imresize(frame_left,2,True).clamp(0, 1) *255).int()
+            frame_left_scaled=(torch.nn.functional.interpolate(frame_left.unsqueeze(0),scale_factor=2,mode='bicubic').squeeze(0).clamp(0, 1) *255).int()
+
+            
             # with amp.autocast(self.device.type):
-            output = self.model(frame)
-            output = torch.round(output.detach().squeeze()[ [2, 1, 0],:, :].clamp(0, 1) *255).permute(1,2,0).int()
+            output = self.model(frame_right)
+            output = torch.round(output.detach().squeeze().clamp(0, 1) *255).int()
+            
+            output = torch.cat([frame_left_scaled,output],dim=2 if is_left_and_right else 1).int()
+            # RGB -> BGR and C, H, W -> H, W, C
+            output = output[ [2, 1, 0],:, :].permute(1,2,0)
+            
             if self.ones is None :
                 self.ones = torch.ones((output.shape[0],output.shape[1],1), dtype=torch.uint8).cuda()
             elif (self.ones.shape[0] != output.shape[0]) or (self.ones.shape[1] != output.shape[1]) or (self.ones.shape[2] != output.shape[2]):
                 self.ones = torch.ones((output.shape[0],output.shape[1],1), dtype=torch.uint8).cuda()
                 
             output = torch.cat([output,self.ones ], dim=2)
-            LOGGER.debug(f"frame time: {(time.perf_counter()-start_time)*1000:.3f} ms")
             output =  [output]
+            LOGGER.debug(f"frame time: {(time.perf_counter()-start_time)*1000:.3f} ms")
+
 
         # output = [torch.ones((frame.shape[0]*4, frame.shape[1]*4,4),dtype=torch.uint8).cuda()]
         # torch.cuda.synchronize()
@@ -66,3 +81,15 @@ class IMDN(Inferencer):
         
         return output
         # sleep(1)
+
+    def frame_split(self,frame:torch.Tensor):
+        is_left_and_right = False
+        if frame.shape[1]>frame.shape[2]:
+            frame_left = frame[:,:frame.shape[1]//2,:].clone()
+            frame_right = frame[:,frame.shape[1]//2:,:].clone()
+        else:
+            is_left_and_right=True
+            frame_left = frame[:,:,:frame.shape[2]//2].clone()
+            frame_right = frame[:,:,frame.shape[2]//2:].clone()
+
+        return frame_left,frame_right,is_left_and_right

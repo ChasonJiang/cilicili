@@ -16,4 +16,5 @@ class SRStatusCode(Enum):
     ProcessException = 10
     InferredLoaded = 11
     SRException = 12
+    SRWorkerIsQuited = 13
 

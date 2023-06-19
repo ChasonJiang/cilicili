@@ -42,6 +42,7 @@ class VideoEncodeWorker(QObject):
         self.frame_width = multiplier*self.video_context.frame_width
         self.frame_height = multiplier*self.video_context.frame_height
         self.encoder = None
+        print(f"W:{self.frame_width}| H:{self.frame_height}")
 
 
     def initEncoder(self):
@@ -100,7 +101,7 @@ class VideoEncodeWorker(QObject):
                     # self.encode_end_signal.emit()
                     # LOGGER.info("video frame over")
                     break
-                frame:np.ndarray = frame[:,:,:3].cpu().numpy()
+                frame:np.ndarray = frame[:,:,:3].int().cpu().numpy()
 
                 self.encoder.stdin.write(frame.astype(np.uint8).tobytes())
                 curr_frame_pts = 1000.0/self.video_context.frame_rate * curr_frame_index

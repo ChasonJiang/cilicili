@@ -109,12 +109,14 @@ class AudioPlayWorker(QObject):
                 self.cond.wait(self.mutex)
                 
                 if self._isQuit and self.buffer_queue.empty():
+                    self.mutex.unlock()
                     break
                 if self.forced_quit:
                     # 防止decoder因缓冲队满而阻塞,导致无法正常退出
                     if self.buffer_queue.full():
                         self.buffer_queue.get_nowait()
                         self.buffer_queue.get_nowait()
+                    self.mutex.unlock()
                     break
                 LOGGER.debug("AudioPlayWorker resumed")
 

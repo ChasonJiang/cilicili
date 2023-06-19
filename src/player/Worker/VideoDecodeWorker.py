@@ -66,6 +66,7 @@ class VideoDecodeWorker(QObject):
                 if self._isQuit:
                     # LOGGER.info("VideoDecodeWorker quit")
                     self.sr_context.cmdPipe.send(HandlerCmd(HandlerCmd.QuitSRWorker))
+                    self.sr_context.msgPipe.recv()
                     self.clear_pipe()
                     self.sr_context.cmdPipe.send(HandlerCmd(HandlerCmd.QuitSRThread))
                     # self.decoder.terminate()

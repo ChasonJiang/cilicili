@@ -41,7 +41,9 @@ class OfflineSuperResolutionWindow(QWidget,Ui_OfflineSuperResolutionWindow):
         if self.last_inferencerName == self.inferencerName:
             self.log("Current inferencer is loaded")
             return True
-
+        multiplier=self.inferencerInfo["Inferencer"][self.inferencerName]["Multiplier"]
+        assert multiplier != 0
+        self.multiplier = multiplier
         self.srContext.cmdPipe.send(HandlerCmd(HandlerCmd.LoadInferencer,self.inferencerName))
         event_loop = QEventLoop(self)
         while True:

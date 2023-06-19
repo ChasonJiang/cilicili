@@ -58,6 +58,8 @@ class VideoPlayWorker(QObject):
 
         self.frist_load=True
 
+        self.last_frame = None
+
     def setFrameRate(self,frame_rate:int):
         self.curr_frame_rate = frame_rate
         self.delay_constant = 1000.0/self.curr_frame_rate
@@ -106,17 +108,15 @@ class VideoPlayWorker(QObject):
         # self.display_device.clear_screen_signal.emit()
         # self.display_device.clear_screen_signal.emit()
         # self.display_device.clear_screen_signal.emit()
+
+        self.clean_screen()
+        self.clean_screen()
+        self.clean_screen()
+
         while True:
             self.frist_load=False
-            if self._isQuit and self.buffer_queue.empty():
-                self.display_device.clear_screen_signal.emit()
-                break
-            if self.forced_quit:
-                # 防止decoder因缓冲队满而阻塞,导致无法正常退出
-                if self.buffer_queue.full():
-                    self.buffer_queue.get_nowait()
-                    self.buffer_queue.get_nowait()
-                self.display_device.clear_screen_signal.emit()
+            if (self._isQuit and self.buffer_queue.empty()) or self.forced_quit:
+                self.quit_before()
                 break
 
             self.mutex.lock()
@@ -130,13 +130,9 @@ class VideoPlayWorker(QObject):
                 # 使用QWaitCondition阻塞时，os调用wait_block的“瞬间”会释放mutex
                 self.cond.wait(self.mutex)
                 
-                if self._isQuit and self.buffer_queue.empty():
-                    break
-                if self.forced_quit:
-                    # 防止decoder因缓冲队满而阻塞,导致无法正常退出
-                    if self.buffer_queue.full():
-                        self.buffer_queue.get_nowait()
-                        self.buffer_queue.get_nowait()
+                if (self._isQuit and self.buffer_queue.empty()) or self.forced_quit:
+                    self.quit_before()
+                    self.mutex.unlock()
                     break
                 LOGGER.debug("VideoPlayWorker resumed")
 
@@ -183,14 +179,9 @@ class VideoPlayWorker(QObject):
             if not self.drop_frame_flag:
                 self.delay_ms(actual_delay)
                 data= buffer["data"]
-                if isinstance(data,torch.Tensor):
-                    self.display_device.update_signal_tensor.emit(data)
-                #     data=data.cuda()
-                #     torch.cuda.synchronize()
-                #     print(data.device)
-                # self.display_device.update(data)
-                else:
-                    self.display_device.update_signal_np.emit(data)
+                self.last_frame = data
+                self.update_frame(data)
+
             else:
                 self.drop_frame_counter+=1
                 self.drop_frame_flag = False
@@ -203,6 +194,29 @@ class VideoPlayWorker(QObject):
         LOGGER.debug("The frame loss rate of this video is {:.2f} %".format((1.0*self.drop_frame_counter/(self.frame_counter+0.0001))*100))
         LOGGER.debug("VideoPlayWorker quited")
         self.quit_signal.emit(True)
+
+    def update_frame(self,frame):
+        if isinstance(frame,torch.Tensor):
+            self.display_device.update_signal_tensor.emit(frame)
+        else:
+            self.display_device.update_signal_np.emit(frame)
+
+
+    def quit_before(self,):
+        if self.buffer_queue.full():
+            self.buffer_queue.get_nowait()
+            self.buffer_queue.get_nowait()
+        # if self.last_frame is not None:
+        #     if isinstance(self.last_frame,torch.Tensor):
+        #         self.update_frame(torch.zeros_like(self.last_frame))
+        #     else:
+        #         self.update_frame(np.zeros_like(self.last_frame))
+
+    def clean_screen(self):
+        if isinstance(self.display_device.frame,torch.Tensor):
+            self.update_frame(torch.zeros_like(self.display_device.frame))
+        else:
+            self.update_frame(np.zeros_like(self.display_device.frame))
 
 
     # def play(self):

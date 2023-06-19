@@ -79,9 +79,10 @@ class VideoProcessorHandler(Process):
                 self.srContext.msgPipe.send(SRSC.InferredLoaded)
             elif handlerCmd.cmd == HandlerCmd.QuitSRWorker:
                 # self.quitEventLoop()
-                self.quitVideoDecoder()
                 self.quitSRWorker()
+                self.quitVideoDecoder()
                 self.clearFrameBuffer()
+                self.srContext.msgPipe.send(SRSC.SRWorkerIsQuited)
                 continue
             elif handlerCmd.cmd == HandlerCmd.QuitSRThread:
                 

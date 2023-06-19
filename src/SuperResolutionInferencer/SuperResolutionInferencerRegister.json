@@ -1,5 +1,5 @@
 {
-    "Default":"IMDN-REDS",
+    "Default":"IMDN-AVC",
     "Inferencer":{
         "IMDN-REDS":{
             "ClassName":"IMDN",
@@ -10,6 +10,16 @@
             "ClassName":"IMDN",
             "ClassPath":"IMDN-AVC.IMDN",
             "Multiplier":2
+        },
+        "IMDN-RTC":{
+            "ClassName":"IMDN",
+            "ClassPath":"IMDN-RTC.IMDN",
+            "Multiplier":2
+        },
+        "Animesr-x4":{
+            "ClassName":"Animesr",
+            "ClassPath":"Animesr.Animesr",
+            "Multiplier":4
         }
     }
 }

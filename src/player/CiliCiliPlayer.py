@@ -37,6 +37,7 @@ class CiliCiliPlayer(QWidget):
         self._parent = parent
         self.playerControlLayer.switch_play_state.connect(self.switchPlayState)
         self.playerControlLayer.show_full_screen.connect(self.switchFullScreen)
+        self.playerControlLayer.switch_sr_mode.connect(self.switchSRMode)
         self.play_signal.connect(self.play)
         self.player_init_signal.connect(self.player_init)
         # self.switch_full_screen_signal.connect(self.switchFullScreen)
@@ -51,6 +52,8 @@ class CiliCiliPlayer(QWidget):
         self.playWorker = None
         self.player_init()
         self.play_locker = QMutex()
+
+        self.srmode = False
         
 
 
@@ -63,7 +66,7 @@ class CiliCiliPlayer(QWidget):
         self.playWorker.send_duration_time.connect(self.playerControlLayer.setDurationTime)
         self.playWorker.update_playback_progress.connect(self.playerControlLayer.updatePlayProgress)
         self.playerControlLayer.seek_to.connect(self.playWorker.seek)
-        self.playerControlLayer.switch_sr_mode.connect(self.playWorker.switchSRMode)
+        # self.playerControlLayer.switch_sr_mode.connect(lambda state:self.playWorker.switch_sr_mode_signal.emit(state))
         self.playWorker.play_state_reset.connect(lambda:self.playerControlLayer.reset_play_state.emit())
         # self.playThread.started.connect(lambda:self.playWorker.play(media_info))
         self.playThread.start()
@@ -71,6 +74,7 @@ class CiliCiliPlayer(QWidget):
 
     def play(self, media_info:MediaInfo):
         self.play_locker.lock()
+        self.srmode = False
         # self.playWorker.play_pause_signal.emit()
         # self.playWorker.shutdown_signal.emit(True)
         self.playerControlLayer.reset_play_state.emit()
@@ -122,6 +126,11 @@ class CiliCiliPlayer(QWidget):
             self.playWorker.play_resume_signal.emit()
         else:
             self.playWorker.play_pause_signal.emit()
+
+    def switchSRMode(self,):
+        self.srmode = not self.srmode
+        self.playWorker.switch_sr_mode_signal.emit(self.srmode)
+
 
 
 

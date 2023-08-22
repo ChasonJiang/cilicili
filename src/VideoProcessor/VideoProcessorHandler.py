@@ -1,11 +1,6 @@
 import json
 import logging
-from multiprocessing.connection import PipeConnection
 import os
-# from queue import 
-import sys
-# import torch
-from threading import Thread
 from time import sleep
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *

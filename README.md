@@ -1,5 +1,5 @@
 # CILICILI
-Cilicili is a PC client with real-time video super-resolution for Bilibili
+CiliCili is a PC client with real-time video super-resolution for Bilibili
 
 # Technology stack
 PyQt5、PyCuda、Pytorch、OpenGL、FFMPEG

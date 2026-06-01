@@ -52,9 +52,9 @@ class VideoContext():
                 self.req_header = header    
                 if "user-agent" and "referer" in self.req_header.keys():
                     probe = ffmpeg.probe(self.url,
-                                        user_agent=self.req_header["user-agent"], 
+                                        # user_agent=self.req_header["user-agent"], 
                                         referer=self.req_header["referer"], 
-                                        headers=self.req_header
+                                        # headers=self.req_header
                                         )
                 elif "user-agent"  in self.req_header.keys():
                     probe = ffmpeg.probe(self.url,

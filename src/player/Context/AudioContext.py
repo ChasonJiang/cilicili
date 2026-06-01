@@ -44,7 +44,11 @@ class AudioContext():
                     header[k.lower()] = self.req_header[k]
                 self.req_header = header
                 if "user-agent" and "referer" in self.req_header.keys():
-                    probe = ffmpeg.probe(self.url,user_agent=self.req_header["user-agent"], referer=self.req_header["referer"], headers=self.req_header)
+                    probe = ffmpeg.probe(self.url,
+                                        #  user_agent=self.req_header["user-agent"], 
+                                         referer=self.req_header["referer"], 
+                                        #  headers=self.req_header
+                                         )
                 elif "user-agent"  in self.req_header.keys():
                     probe = ffmpeg.probe(self.url,user_agent=self.req_header["user-agent"], headers=self.req_header)
                 elif "referer" in self.req_header.keys():

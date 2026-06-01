@@ -4,10 +4,4 @@
 /bin
 /lib
 /test
-/__pycache__
-/**/__pycache__
-/**/**/__pycache__
-/**/**/**/__pycache__
-/**/**/**/**/__pycache__
-/src/SuperResolution/__pycache__
 *.pyc
